@@ -32,7 +32,7 @@
     </style>
 @endsection
 
-<div class="riwayat">
+<div class="riwayat" wire:poll.60s="filterTransactions">
     <div class="d-flex justify-content-center abu fixed py-4 align-items-center position-relative">
         <a href="/" class="position-absolute start-0 p-3 text-white"
             style="font-size: 24px; border-radius: 50%; background-color: transparent;">
@@ -47,7 +47,8 @@
         <h5 class="mb-0 text-white text-center w-100">Pesanan Saya</h5>
     </div>
 
-    <ul class="custom-nav-tabs justify-content-center d-flex p-0 mt-3" role="tablist">
+    <section>
+    <ul class="custom-nav-tabs justify-content-center d-flex mt-3 pe-2" role="tablist" style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%; padding-left:110px; ">
         @foreach ($statuses as $key => $label)
             <li class="custom-nav-item" role="presentation">
                 <a class="custom-nav-link {{ $filter === $key ? 'active' : '' }}"
@@ -57,32 +58,39 @@
             </li>
         @endforeach
     </ul>
+</section>
 
-    <div class="mt-3">
+    <div class="mt-3 pb-4 mb-5">
         @forelse ($transactions as $transaction)
+            <!-- Pengecekan apakah bukti_image kosong -->
             <a
-                href="{{ $transaction->status === 'pending' ? '/konfirmasi/' . $transaction->id : '/detail_riwayat/' . $transaction->id }}">
+                href="{{ empty($transaction->bukti_image) ? '/konfirmasi/' . $transaction->id : '/detail_riwayat/' . $transaction->id }}">
                 <div class="abu p-3 rounded border mb-3 mx-3" style="border-color: #4343433a !important;">
                     <div class="d-flex align-items-center">
                         <h1 class="fw-bold fs-6 mb-1 text-white">Layanan</h1>
                         <button type="button"
-                            class="btn btn-outline-{{ $transaction->status === 'completed'
-                                ? 'success'
-                                : ($transaction->status === 'canceled'
-                                    ? 'danger'
-                                    : ($transaction->status === 'approved'
-                                        ? 'primary'
-                                        : 'warning')) }} ms-auto py-1 fs-9">
-                            {{ $transaction->status === 'pending'
-                                ? 'Menunggu Pembayaran'
+                        class="btn btn-outline-{{ $transaction->status === 'completed'
+                            ? 'success'
+                            : ($transaction->status === 'canceled'
+                                ? 'danger'
                                 : ($transaction->status === 'approved'
-                                    ? 'Menunggu Hari'
-                                    : ($transaction->status === 'completed'
-                                        ? 'Selesai'
-                                        : ($transaction->status === 'canceled'
-                                            ? 'Dibatalkan'
-                                            : ''))) }}
-                        </button>
+                                    ? 'primary'
+                                    : ($transaction->status === 'pending' && !empty($transaction->bukti_image)
+                                        ? 'info'
+                                        : 'warning'))) }} ms-auto py-1 fs-9">
+                        {{ $transaction->status === 'pending'
+                            ? (!empty($transaction->bukti_image)
+                                ? 'Menunggu Konfirmasi'
+                                : 'Menunggu Pembayaran')
+                            : ($transaction->status === 'approved'
+                                ? 'Menunggu Hari'
+                                : ($transaction->status === 'completed'
+                                    ? 'Selesai'
+                                    : ($transaction->status === 'canceled'
+                                        ? 'Dibatalkan'
+                                        : ''))) }}
+                    </button>
+                    
                     </div>
 
                     <div>
@@ -91,9 +99,10 @@
                     </div>
 
                     <div class="d-flex">
-                        <img src="{{ asset('storage/' . $transaction->bukti_image ?? 'https://via.placeholder.com/70') }}"
+                        <img src="{{ asset('storage/' . ($transaction->bukti_image ?? 'images/profiles/default1.jpg')) }}"
                             alt="Service Image" class="mt-1 img-fluid rounded border border-white"
                             style="height: 70px; width: 70px; object-fit: cover;">
+
                         <div class="d- align-items-center pb-1 px-3 my-1">
                             <div class="">
                                 @foreach ($transaction->details as $detail)
@@ -112,44 +121,22 @@
                 </div>
             </a>
         @empty
-            <div class="text-center m-3 p-3 abu rounded">
-                <p class="text-danger mt-3">Belum ada transaksi untuk status</p>
-
-                <div wire:ignore.self id="lottie"></div>
+            <div x-data="lottieAnimation()" class="text-center m-3 p-3 abu rounded">
+                <p class="text-danger mt-3">Belum ada transaksi untuk status ini</p>
+                <div x-ref="lottie" class="lottie-animation"></div>
             </div>
         @endforelse
-{{--         
-        <div class="pb-4">
-            <p class="fs-6 emas m-0">Anda Belum memiliki jadwal</p>
-            <div id="lottie"></div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
-            <script>
-                var animation = lottie.loadAnimation({
-                    container: document.getElementById('lottie'),
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    path: '{{ asset('images/Animation2.json') }}'
-                });
-            </script>
-        </div> --}}
     </div>
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
-        <script>
-            document.addEventListener('livewire:load', function() {
-                initializeLottie();
-            });
+</div>
 
-            document.addEventListener('livewire:update', function() {
-                initializeLottie();
-            });
-
-            function initializeLottie() {
-                var lottieElement = document.getElementById('lottie');
-                if (lottieElement && lottieElement.childElementCount === 0) { // Cek apakah elemen kosong
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+    <script>
+        function lottieAnimation() {
+            return {
+                init() {
                     lottie.loadAnimation({
-                        container: lottieElement,
+                        container: this.$refs.lottie,
                         renderer: 'svg',
                         loop: true,
                         autoplay: true,
@@ -157,7 +144,6 @@
                     });
                 }
             }
-        </script>
-    @endpush
-
-</div>
+        }
+    </script>
+@endpush

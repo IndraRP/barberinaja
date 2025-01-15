@@ -64,200 +64,177 @@
     </style>
 @endsection
 
-
-<div class="home pb-5 mb-5" id="content">
+<div class="home pb-4 mb-5" id="content">
 
     <!-- Header -->
     <div x-data="{ isVisible: true }">
-        <div class="navbar navbar-dark bg-dark fixed-top d-flex justify-content-between align-items-center p-3">
+        <div class="navbar navbar-dark fixed-top d-flex justify-content-between align-items-center px-3"
+            style="padding-top: 12px; padding-bottom: 12px; background-color: #333;">
             <div class="d-flex flex-column">
-                <span class="text-white fs-8">Selamat pagi</span>
+                <span class="text-white fs-8 ">Selamat pagi, </span>
                 <h1 class="h6 text-white m-0 fs-7">{{ $name }}</h1>
             </div>
             <div class="d-flex align-items-center">
-                <!-- Search Icon -->
-                <button class="btn btn-dark border border-light rounded-pill" type="button"
-                    style="height: 40px; width: 40px; transition: background-color 0.3s;"
-                    @click="isVisible = isVisible ? false : true">
-                    <i class="bi bi-search text-white"></i>
-                </button>
                 <!-- Foto Profil -->
-                <img src="{{ asset('storage/' . ($image ?? 'images/profiles/barber1.png')) }}"
-                    class="rounded-circle border border-white ms-3 object-fit-cover" style="height: 40px; width: 40px;"
-                    alt="Profile">
+                @if (!empty($image))
+                    <img src="{{ asset('storage/' . $image) }}"
+                        class="rounded-circle border border-white ms-3 object-fit-cover"
+                        style="height: 40px; width: 40px;" alt="Profile" data-bs-toggle="modal"
+                        data-bs-target="#profileModal">
+                @endif
             </div>
-            <div x-show="!isVisible" class="mt-3 w-100">
-                @include('livewire.user.home.search-input')
-            </div>
-        </div>
-        <div x-show="isVisible" class="mt-2 px-2 w-100">
-            @include('livewire.user.home.search-input')
         </div>
     </div>
 
+    <!-- Modal untuk Foto Besar -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-0">
+                <div class="modal-body p-3">
+                    <!-- Gambar Besar di dalam Modal -->
+                    <img src="{{ asset('storage/' . ($image ?? 'images/profiles/default1.jpg')) }}"
+                        class="img-fluid rounded mx-auto d-block" alt="Profile">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Banner Section -->
-    <section class="splide mt-1 pb-1" style="border-radius: 15px">
+    <section class="splide mt-2 pb-1 mx-1" style="border-radius: 15px">
         <div class="splide__track" style="border-radius: 15px">
             <ul class="splide__list" style="border-radius: 15px">
-                <li class="splide__slide px-2" style="border-radius: 15px">
-                    <img src="https://static.republika.co.id/uploads/images/inpicture_slide/captain_221104100511-473.jpeg"
-                        alt="Slide 01" class="splide__image" />
-                </li>
-                <li class="splide__slide px-2">
-                    <img src="https://img.okezone.com/content/2023/03/02/612/2773878/support-pejuang-kanker-captain-barbershop-gratiskan-customer-yang-mau-botak-di-campaign-captaincancercare-ahApvULolF.JPG"
-                        alt="Slide 02" class="splide__image" />
-                </li>
-                <li class="splide__slide px-2">
-                    <img src="https://surabayaasik.com/wp-content/uploads/2023/03/Rekomendasi-Kursus-Barbershop-di-Surabaya.jpg"
-                        alt="Slide 03" class="splide__image" />
-                </li>
-                <li class="splide__slide px-2">
-                    <img src="https://cdn.camberwellshopping.com.au/wp-content/uploads/2021/07/13111806/The-best-barbers-in-Camberwell.jpg"
-                        alt="Slide 03" class="splide__image" />
-                </li>
-                <li class="splide__slide px-2">
-                    <img src="https://images.squarespace-cdn.com/content/v1/62f1307024cba25fc6025b32/31700a79-c001-45ff-9809-3081c8dcbf5b/AdobeStock_374326500.jpeg"
-                        alt="Slide 03" class="splide__image" />
-                </li>
+                @foreach ($banners as $banner)
+                    <li class="splide__slide px-1" style="border-radius: 15px">
+                        <img src="{{ asset('storage/' . $banner->image) }}" alt="Banner Image" class="splide__image" />
+                    </li>
+                @endforeach
             </ul>
         </div>
     </section>
 
+
+
     <!-- Attention Section -->
-    <div class="px-2 pb-2">
-        <!-- Menampilkan transaksi approved -->
-        @if (count($approvedTransactions) === 0)
-        @else
-            <div class="transactions mt-4 tren px-2 pb-2 pt-3 rounded">
-                <div class="d-flex align-items-center">
-                    <h3 class="emas fs-6 fs-bolder m-0">Transaksi Disetujui :</h3>
-                    <button type="button" class="btn btn-outline-success ms-auto fs-11">Pembayaran Disetujui</button>
-                </div>
-                <ul class="list-group fs-8 pt-1">
-                    @foreach ($approvedTransactions as $transaction)
-                        <a href="{{ url('/detail_riwayat/' . $transaction->id) }}">
-                            <li class="list-group-item abu border border-warning rounded my-1 px-2 text-white">
-                                <div class="d-flex">
-                                    <div class="d-block m-0">
-                                        <p class="fs-7 fw-bolder mb-0 mt-1">Jadwal Anda :</p>
-                                        <p class="m-0 fs-7">
-                                            @foreach ($transaction->details as $detail)
-                                                {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
-                                            @endforeach
-                                        </p>
-                                    </div>
+    <section>
+        <div class="p-2"
+            style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%;">
+            <div style="display: flex; min-width: 100%; overflow-x: auto;">
+                <!-- Transaksi Pending -->
+                @foreach ($pendingTransactions as $transaction)
+                    <a href="{{ url('/konfirmasi/' . $transaction->id) }}">
+                        <li class="list-group-item abu border border-warning rounded my-1 px-2 me-2 text-white mt-3"
+                            style="flex: 0 0 auto; width: 300px; min-width: 300px;">
+                            <div class="d-flex align-items-center py-1">
+                                <h3 class="emas fs-6 fs-bolder mt-2"> Belum Bayar</h3>
+                                <div class="fs-11 border border-danger text-danger bg-transparent p-2 rounded" style="margin-left:127px">Belum bayar</div>
 
-                                    <div class="text-end ms-auto">
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_date }}</span> : <strong
-                                                class="bi bi-calendar fs-6"></strong>
-                                        </p>
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_time }}</span> : <strong
-                                                class="bi bi-stopwatch fs-6"></strong>
-                                        </p>
-                                    </div>
+                            </div>
+
+                            <div class="d-flex" style="margin-bottom:4px;">
+                                <div class="d-block m-0">
+                                    <p class="m-0 fs-7">
+                                        @foreach ($transaction->details as $detail)
+                                            {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
+                                        @endforeach
+                                    </p>
+                                    <p class="m-0 fs-7 emas fw-bolder">
+                                        <span>Total Harga</span>
+                                        @foreach ($transaction->details as $detail)
+                                            Rp {{ number_format($detail->total_harga) }}
+                                        @endforeach
+                                    </p>
                                 </div>
-                            </li>
-                        </a>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <!-- Menampilkan transaksi pending -->
-        @if (count($pendingTransactions) === 0)
-        @else
-            <div class="transactions mt-4 tren px-2 pb-2 pt-3 rounded">
-                <div class="d-flex align-items-center">
-                    <h3 class="emas fs-6 fs-bolder m-0">Transaksi Pending :</h3>
-                    <button type="button" class="btn btn-outline-danger ms-auto fs-11">Menunggu Pembayaran</button>
-                </div>
-                <ul class="list-group fs-8 pt-1">
-                    @foreach ($pendingTransactions as $transaction)
-                        <a href="{{ url('/konfirmasi/' . $transaction->id) }}">
-                            <li class="list-group-item abu border border-warning rounded my-1 px-2 text-white">
-                                <div class="d-flex">
-                                    <div class="d-block m-0">
-                                        <p class="fs-7 fw-bolder mb-0 mt-1">Jadwal Anda :</p>
-                                        <p class="m-0 fs-7">
-                                            @foreach ($transaction->details as $detail)
-                                                {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
-                                            @endforeach
-                                        </p>
-                                        <p class="m-0 fs-7 emas fw-bolder">
-                                            <span>Total Harga</span>
-                                            @foreach ($transaction->details as $detail)
-                                                Rp {{ number_format($detail->total_harga) }}
-                                            @endforeach
-                                        </p>
-                                    </div>
-
-                                    <div class="text-end ms-auto">
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_date }}</span> : <strong
-                                                class="bi bi-calendar fs-6"></strong>
-                                        </p>
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_time }}</span> : <strong
-                                                class="bi bi-stopwatch fs-6"></strong>
-                                        </p>
-                                    </div>
+                                <div class="text-end ms-auto fs-8 mb-1">
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_date }}</span> <strong
+                                            class="bi bi-calendar fs-6"></strong>
+                                    </p>
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_time }}</span> <strong
+                                            class="bi bi-stopwatch fs-6"></strong>
+                                    </p>
                                 </div>
-                            </li>
-                        </a>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                            </div>
+                        </li>
+                    </a>
+                @endforeach
 
+                <!-- Transaksi Waiting Confirmation -->
+                @foreach ($waitingConfirmationTransactions as $transaction)
+                    <a href="{{ url('/detail_riwayat/' . $transaction->id) }}">
+                        <li class="list-group-item abu border border-warning rounded my-1 px-2 me-2 text-white mt-3"
+                            style="flex: 0 0 auto; width: 300px; min-width: 300px;">
+                            <div class="d-flex align-items-center py-1">
+                                <h3 class="emas fs-6 fs-bolder mt-2"> Menunggu Konfirmasi </h3>
 
-        <!-- Menampilkan transaksi menunggu konfirmasi -->
-        @if (count($waitingConfirmationTransactions) === 0)
-        @else
-            <div class="transactions mt-4 tren px-2 pb-2 pt-3 rounded">
-                <div class="d-flex align-items-center">
-                    <h3 class="emas fs-6 fs-bolder m-0">Menunggu Konfirmasi:</h3>
-                    <button type="button" class="btn btn-outline-warning ms-auto fs-11">Menunggu Konfirmasi</button>
-                </div>
-                <ul class="list-group fs-8 pt-1">
-                    @foreach ($waitingConfirmationTransactions as $transaction)
-                        <a href="{{ url('/detail_riwayat/' . $transaction->id) }}">
-                            <li class="list-group-item abu border border-warning rounded my-1 px-2 text-white">
-                                <div class="d-flex">
-                                    <div class="d-block m-0">
-                                        <p class="fs-7 fw-bolder mb-0 mt-1">Jadwal Anda :</p>
-                                        <p class="m-0 fs-7">
-                                            @foreach ($transaction->details as $detail)
-                                                {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
-                                            @endforeach
-                                        </p>
-                                    </div>
+                                <div class="fs-11 border border-warning bg-transparent text-warning p-2 rounded" style="margin-left:23px">Menunggu Konfirmasi</div>
+                            </div>
 
-                                    <div class="text-end ms-auto">
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_date }}</span> : <strong
-                                                class="bi bi-calendar fs-6"></strong>
-                                        </p>
-                                        <p class="m-0">
-                                            <span>{{ $transaction->formatted_time }}</span> : <strong
-                                                class="bi bi-stopwatch fs-6"></strong>
-                                        </p>
-                                    </div>
+                            <div class="d-flex pb-2 fs-8">
+                                <div class="d-block m-0">
+                                    <p class="fs-7 fw-bolder mb-0 mt-1">Jadwal Anda :</p>
+                                    <p class="m-0 fs-7">
+                                        @foreach ($transaction->details as $detail)
+                                            {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
+                                        @endforeach
+                                    </p>
                                 </div>
-                            </li>
-                        </a>
-                    @endforeach
-                </ul>
+                                <div class="text-end ms-auto">
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_date }}</span> <strong
+                                            class="bi bi-calendar fs-6"></strong>
+                                    </p>
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_time }}</span> <strong
+                                            class="bi bi-stopwatch fs-6"></strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </a>
+                @endforeach
+
+                <!-- Transaksi Approved -->
+                @foreach ($approvedTransactions as $transaction)
+                    <a href="{{ url('/detail_riwayat/' . $transaction->id) }}">
+                        <li class="list-group-item abu border border-warning rounded  px-2 text-white me-2 mt-3"
+                            style="flex: 0 0 auto; width: 300px; min-width: 300px;">
+                            <div class="d-flex align-items-center py-1">
+                                <h3 class="emas fs-6 fs-bolder me-5 mt-2"> Menunggu Hari </h3>
+                                <div class="fs-11 border border-success bg-transparent p-2 rounded text-success" style="margin-left:48px">Menunggu Hari</div>
+
+                            </div>
+                            <div class="d-flex pb-2">
+                                <div class="d-block m-0">
+                                    <p class="fs-7 fw-bolder mb-0 mt-1">Jadwal Anda :</p>
+                                    <p class="m-0 fs-7">
+                                        @foreach ($transaction->details as $detail)
+                                            {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
+                                        @endforeach
+                                    </p>
+                                </div>
+                                <div class="text-end ms-auto fs-8">
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_date }}</span> <strong
+                                            class="bi bi-calendar fs-6"></strong>
+                                    </p>
+                                    <p class="m-0">
+                                        <span class="me-1">{{ $transaction->formatted_time }}</span> <strong
+                                            class="bi bi-stopwatch fs-6"></strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </a>
+                @endforeach
             </div>
-        @endif
-
-
-    </div>
+        </div>
+    </section>
 
 
     <!-- Layanan Section -->
-    <section class="pt-3 px-2">
+    <section class="px-2 pt-2">
         <div class="d-flex align-items-center">
             <h2 class="text-white fs-6 mb-0">Layanan</h2>
             <a href="/booking" class="text-info ms-auto m-0 fs-7 text-decoration-none">Lihat Semua</a>
@@ -303,90 +280,38 @@
         </div>
     </section>
 
-    <!-- diskon Section -->
     <section class="mt-3 px-2">
         <div class="d-flex overflow-auto">
-            <!-- Slide Pertama -->
-            <div class="flex-shrink-0 rounded kuning p-3 me-2 klaim-btn" style="width: 265px;">
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p class="text-black-50 mb-1 fs-8">Segera Potong!!!</p>
-                        <h1 class="fw-bold fs-7 mb-2 text-white">Dapatkan Discount 70%</h1>
-                        <button class="btn btn-dark btn-sm fs-9 rounded-pill">
-                            <span class="p-2">Klaim Sekarang</span>
-                        </button>
-                    </div>
-                    <!-- Gambar diposisikan di kanan -->
-                    <img src="{{ asset('images/diskon.png') }}" alt="Discount Icon"
-                        class="ms-auto img-fluid rounded" style="height: 55px; width: 55px;">
-                </div>
-            </div>
+            @foreach ($discounts as $discount)
+                @php
+                    $usedDiscount = App\Models\UserDiscount::where('user_id', auth()->id())
+                        ->where('discount_id', $discount->id)
+                        ->exists();
+                @endphp
 
-            <!-- Slide Kedua -->
-            <div class="flex-shrink-0 rounded merah p-3 klaim-btn me-2" style="width: 265px;">
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p class="text-black-50 mb-1 fs-8">Potongan Harga Besar Menanti!</p>
-                        <h1 class="fw-bold fs-7 mb-2 text-white">Hanya Untuk Anda</h1>
-                        <button class="btn btn-dark btn-sm fs-9 rounded-pill">
-                            <span class="p-2">Klaim Sekarang</span>
-                        </button>
+                @if (!$usedDiscount)
+                    <!-- Slide Pertama -->
+                    <div class="flex-shrink-0 rounded kuning p-3 me-2" style="width: 265px;">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="text-black-50 mb-1 fs-8 fw-bolder">{{ $discount->description }}</p>
+                                <h1 class="fw-bold fs-7 mb-2 text-white">{{ $discount->name }}</h1>
+                                <!-- Tombol Pilih Diskon -->
+                                <a
+                                    href="{{ $discount->service ? '/bookingdetail/' . $discount->service->id : '/booking' }}">
+                                    <button wire:click="selectDiscount({{ $discount->id }})"
+                                        class="btn btn-dark btn-sm fs-9 rounded-pill">
+                                        <span class="p-2">Pakai Sekarang</span>
+                                    </button>
+                                </a>
+                            </div>
+                            <!-- Gambar diposisikan di kanan -->
+                            <img src="{{ asset('storage/' . $discount->image) }}" alt="{{ $discount->name }}"
+                                class="ms-auto img-fluid rounded" style="height: 55px; width: 55px;">
+                        </div>
                     </div>
-                    <!-- Gambar diposisikan di kanan -->
-                    <img src="{{ asset('images/diskon2.png') }}" alt="Discount Icon"
-                        class="ms-auto img-fluid rounded" style="height: 55px; width: 55px;">
-                </div>
-            </div>
-
-            <!-- Slide Kedua -->
-            <div class="flex-shrink-0 rounded tren p-3 klaim-btn me-2" style="width: 265px;">
-                <div class="d-flex align-items-center">
-                    <!-- Gambar diposisikan di kanan -->
-                    <img src="{{ asset('images/barber1.jpeg') }}" alt="Discount Icon"
-                        class="me-auto img-fluid rounded" style="height: 55px; width: 55px; object-fit: cover;">
-
-                    <div class="text-end">
-                        <p class="text-black-50 mb-1 fs-8">Ingin tampil Tampan seperti ini???</p>
-                        <h1 class="fw-bold fs-7 mb-2 text-white">Potong Sekarang</h1>
-                        <button class="btn btn-dark btn-sm fs-9 rounded-pill">
-                            <span class="p-2">Pesan Sekarang</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide Kedua -->
-            <div class="flex-shrink-0 rounded abu p-3 klaim-btn me-2" style="width: 265px;">
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p class="text-black-50 mb-1 fs-8">Ada Diskon Akhir Tahun nih</p>
-                        <h1 class="fw-bold fs-7 mb-2 text-white">Lumayan lahh!!!</h1>
-                        </h1>
-                        <button class="btn btn-dark btn-sm fs-9 rounded-pill">
-                            <span class="p-2">Klaim Sekarang</span>
-                        </button>
-                    </div>
-                    <!-- Gambar diposisikan di kanan -->
-                    <img src="{{ asset('images/diskon2.png') }}" alt="Discount Icon"
-                        class="ms-auto img-fluid rounded" style="height: 55px; width: 55px;">
-                </div>
-            </div>
-
-            <!-- Slide Kedua -->
-            <div class="flex-shrink-0 rounded merah p-3 klaim-btn" style="width: 265px;">
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p class="text-black-50 mb-1 fs-8">Khusus Styling rambut</p>
-                        <h1 class="fw-bold fs-7 mb-2 text-white">Diskon 70%</h1>
-                        <button class="btn btn-dark btn-sm fs-9 rounded-pill">
-                            <span class="p-2">Klaim Sekarang</span>
-                        </button>
-                    </div>
-                    <!-- Gambar diposisikan di kanan -->
-                    <img src="{{ asset('images/tren5.jpg') }}" alt="Discount Icon" class="ms-auto img-fluid rounded"
-                        style="height: 55px; width: 55px; object-fit: cover;">
-                </div>
-            </div>
+                @endif
+            @endforeach
         </div>
     </section>
 
@@ -416,31 +341,8 @@
                 </a>
             @endforeach
         </div>
-
     </section>
-
-
-    <script>
-        // SweetAlert untuk tombol klaim
-        document.querySelectorAll('.klaim-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.closest('div').id;
-                const message = id === 'claim-1' ? 'Klaim Diskon 70% berhasil!' : 'Klaim khusus berhasil!';
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: message,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    background: '#1e1e2d',
-                    color: '#ffffff',
-                    iconColor: '#00c851',
-                    confirmButtonColor: '#ffb22d',
-                });
-            });
-        });
-    </script>
 </div>
-
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@3.6.12/dist/js/splide.min.js"></script>
@@ -459,6 +361,26 @@
             });
 
             splide.mount();
+        });
+    </script>
+
+    <script>
+        // SweetAlert untuk tombol klaim
+        document.querySelectorAll('.klaim-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.closest('div').id;
+                const message = id === 'claim-1' ? 'Klaim Diskon 70% berhasil!' : 'Klaim khusus berhasil!';
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    background: '#1e1e2d',
+                    color: '#ffffff',
+                    iconColor: '#00c851',
+                    confirmButtonColor: '#ffb22d',
+                });
+            });
         });
     </script>
 @endpush

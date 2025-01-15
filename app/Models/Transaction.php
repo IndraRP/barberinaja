@@ -58,4 +58,6 @@ class Transaction extends Model
     {
         return $this->hasMany(BarberSchedule::class);
     }
+
+
 }

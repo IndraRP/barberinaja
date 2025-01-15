@@ -4,11 +4,13 @@ namespace App\Livewire\User\Booking;
 
 use Livewire\Component;
 use App\Models\Transaction;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\WithFileUploads;
 use Throwable;
 
 class Konfirmasi extends Component
 {
+    use LivewireAlert;
     use WithFileUploads;
 
     public $transaction;
@@ -35,12 +37,19 @@ class Konfirmasi extends Component
         }
     }
 
+    public function showAlert()
+    {
+        $this->alert('success', 'Berhasil!', [
+            'text' => 'No. Rekening berhasil disalin'
+        ]);
+    }
+
     public function confirmPayment()
     {
         $this->validate();
         if (!$this->bukti_image) {
             logger()->error('File tidak ditemukan saat validasi.');
-            session()->flash('error', 'Harap upload file sebelum mengonfirmasi pembayaran.');
+            $this->alert('error', 'Harap upload file sebelum mengonfirmasi pembayaran.');
             return;
         }
 
@@ -50,23 +59,23 @@ class Konfirmasi extends Component
         $this->transaction->bukti_image = $path;
         $this->transaction->save();
 
-        session()->flash('success', 'Pembayaran berhasil dikonfirmasi.');
+        $this->alert('success', 'Konfirmasi berhasil dilakukan.');
         return redirect()->route('history');
     }
 
-    public function cancelTransaction()
-    {
-        try {
-            $this->transaction->status = 'canceled';
-            $this->transaction->save();
+    // public function cancelTransaction()
+    // {
+    //     try {
+    //         $this->transaction->status = 'canceled';
+    //         $this->transaction->save();
 
-            session()->flash('success', 'Transaksi berhasil dibatalkan.');
-            return redirect()->route('history');
-        } catch (Throwable $e) {
-            logger()->error('Error membatalkan transaksi: ' . $e->getMessage());
-            session()->flash('error', 'Terjadi kesalahan saat membatalkan transaksi.');
-        }
-    }
+    //         session()->flash('success', 'Transaksi berhasil dibatalkan.');
+    //         return redirect()->route('history');
+    //     } catch (Throwable $e) {
+    //         logger()->error('Error membatalkan transaksi: ' . $e->getMessage());
+    //         session()->flash('error', 'Terjadi kesalahan saat membatalkan transaksi.');
+    //     }
+    // }
 
     public function render()
     {

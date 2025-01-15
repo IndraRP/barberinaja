@@ -9,9 +9,12 @@ use App\Models\Service;
 use App\Models\Barber;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+
 
 class Metodepembayaran extends Component
 {
+    use LivewireAlert;
     public $barber_id;
     public $barber;
     public $detail;
@@ -21,6 +24,9 @@ class Metodepembayaran extends Component
     public $showModal = false;
     public $transactionId;
     public $metode_pembayaran;
+    public $selected_discount;
+
+    public $nomer_rekening;
 
     protected $rules = [
         'metode_pembayaran' => 'required',
@@ -28,7 +34,7 @@ class Metodepembayaran extends Component
 
     public function mount()
     {
-        // Cek dan ambil data dari sesi
+        // Ambil data dari sesi
         $this->detail = Session::get('detail', [
             'name' => '',
             'phone_number' => '',
@@ -36,6 +42,8 @@ class Metodepembayaran extends Component
             'barber' => null,
             'metode_pembayaran' => null,
         ]);
+    
+        $this->selected_discount = Session::get('selected_discount', null);
     
         $serviceDetail = Session::get('service_detail', null);
         if ($serviceDetail) {
@@ -53,28 +61,40 @@ class Metodepembayaran extends Component
         $this->metode_pembayaran = $this->detail['metode_pembayaran'] ?? null;
         $this->barber = $this->detail['barber_name'];
         $this->barber_id = $this->detail['barber'];
+
     
         if (!auth()->check()) {
             return redirect('/login')->with('error', 'Anda harus login terlebih dahulu.');
         }
     
-        // Biaya admin dan aplikasi
         $biayaAdmin = 1000;
         $biayaAplikasi = 1000;
     
-        // Ambil total pembayaran saat ini
-        $totalPembayaran = Session::get('total_pembayaran', 0);
+        // Cek dan hitung total pembayaran
+        $totalPembayaran = $this->servicePrice + $biayaAdmin + $biayaAplikasi;
     
-        // Cek apakah total sudah mencakup biaya admin dan aplikasi
-        if ($totalPembayaran === 0) {
-            $total = $this->servicePrice + $biayaAdmin + $biayaAplikasi;
-            Session::put('total_pembayaran', $total);
-        } else {
-            // Total pembayaran sudah ada, jadi tidak perlu menambahkan biaya lagi
-            Session::put('total_pembayaran', $totalPembayaran);
+        // Jika ada diskon, kurangi harga dengan diskon
+        if ($this->selected_discount && $this->selected_discount['discount_percentage']) {
+            $discountAmount = $this->servicePrice * ($this->selected_discount['discount_percentage'] / 100);
+            $totalPembayaran = ($this->servicePrice - $discountAmount) + $biayaAdmin + $biayaAplikasi;
         }
+    
+        // Simpan total pembayaran ke session
+        Session::put('total_pembayaran', $totalPembayaran);
+
+        //dd(session()->all());
+
+        $this->nomer_rekening = '1234567890'; // Ganti dengan nilai yang sesuai
+
     }
     
+   public function showAlert()
+{
+    $this->alert('success', 'Berhasil!', [
+        'text' => 'No. Rekening berhasil disalin'
+    ]);
+}
+
     public function bayar()
     {
         $totalPembayaran = Session::get('total_pembayaran', 0);
@@ -82,31 +102,33 @@ class Metodepembayaran extends Component
         // Pastikan kita mengambil ID barber dan data lainnya dengan benar
         $transaction = Transaction::create([
             'customer_id' => auth()->user()->id,
-            'barber_id' => $this->barber_id, // Gunakan barber_id
+            'barber_id' => $this->barber_id,
             'name_customer' => $this->detail['name'],
             'phone_number' => $this->detail['phone_number'],
             'appointment_date' => $this->detail['tanggal'],
             'time' => $this->detail['time'],
-            'status' => 'pending',
+            'status' => 'pending',  // Status transaksi bisa diubah nanti
         ]);
 
         // Simpan detail transaksi
         DetailTransaction::create([
             'transactions_id' => $transaction->id,
             'service_id' => $this->serviceId,
-            'harga' => $this->servicePrice, // Harga layanan tetap ada
+            'harga' => $this->servicePrice,
             'total_harga' => $totalPembayaran, // Total yang sudah dihitung di session
         ]);
 
         // Simpan ID transaksi ke properti Livewire
         $this->transactionId = $transaction->id;
+    } 
 
-        // Hapus sesi setelah transaksi selesai
-        Session::forget('detail');
-        Session::forget('service_detail');
-        Session::forget('total_pembayaran');
+    public function hapus(){
+          // Hapus sesi setelah transaksi selesai
+          Session::forget('detail');
+          Session::forget('selected_discount');
+          Session::forget('service_detail');
+          Session::forget('total_pembayaran');
     }
-
 
     public function render()
     {

@@ -1,13 +1,22 @@
-@section('title', 'Profile Barberman')
+@section('title', 'Home')
 
 @section('styles')
     <style>
+        .icon-size {
+            font-size: 1.5rem;
+        }
+
+        .icon-size2 {
+            font-size: 1.3rem;
+        }
+
         .profile-card {
             color: #eecc66;
             background-color: #001f3f00;
             border-radius: 20px;
             width: 100%;
-            padding: 20px 10px 0;
+            padding: 20px 10px 50px;
+            min-height: screen;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -128,6 +137,10 @@
         .nav_card {
             margin-top: 65px;
         }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 1);
+        }
     </style>
 @endsection
 
@@ -149,10 +162,11 @@
             <div class="profile-card">
                 <div class="profile-header"></div>
 
-                <img src="{{ asset('storage/' . $image) }}" alt="Profile Picture" class="profile-image">
+                <img src="{{ asset('storage/' . ($image ?? 'images/profiles/default.jpg')) }}" alt="Profile Picture"
+                    class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
 
-                <div class="edit-icon mt-5" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                    <i class="bi bi-pencil-square emas fw-bold fs-10"></i>
+                <div class="edit-icon mt-5" data-bs-toggle="modal" data-bs-target="#editimageModal">
+                    <i class="bi bi-camera-fill emas fw-bold fs-6"></i>
                 </div>
 
                 <h2>{{ $name }}</h2>
@@ -161,60 +175,67 @@
                 <div class="nav_card py-4 warna mx-2 rounded">
                     <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
                         data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                        <i class="bi bi-pencil-square emas fw-bold fs-5"></i>
+                        <i class="fa-solid fa-square-pen emas fw-bold icon-size"></i>
                         <h1 class="fs-7 text-white mx-3 pt-2">Edit Profile</h1>
                         <i class="fa-solid fa-chevron-right ms-auto chevron-right"></i>
                     </div>
 
                     <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
                         data-bs-toggle="modal" data-bs-target="#editPasswordModal">
-                        <i class="fa-solid fa-unlock-keyhole emas fw-bold fs-5"></i>
+                        <i class="fa-solid fa-table-cells-row-unlock emas fw-bold icon-size2"></i>
                         <h1 class="fs-7 text-white mx-3 pt-2">Ubah Password</h1>
-                        <i class="fa-solid fa-chevron-right ms-auto chevron-right"></i>
+                        <i class="fa-solid fa-chevron-right ms-auto chevron-right "></i>
                     </div>
 
                     <a href="mailto:indra@gmail.com?subject=Hubungi%20Kami&body=Halo,%20saya%20ingin%20menghubungi%20Anda"
                         class="text-decoration-none">
                         <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile">
-                            <i class="fa-solid fa-square-phone emas fw-bold fs-5"></i>
+                            <i class="fa-solid fa-square-phone emas fw-bold icon-size"></i>
                             <h1 class="fs-7 text-white mx-3 pt-2">Hubungi Kami</h1>
                             <i class="fa-solid fa-chevron-right ms-auto chevron-right emas"></i>
                         </div>
                     </a>
 
                     <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
-                        onclick="confirmLogout()">
-                        <i class="bi bi-arrow-right-square-fill text-danger fw-bold fs-5"></i>
+                        data-bs-toggle="modal" data-bs-target="#logoutModal">
+                        <i class="bi bi-arrow-right-square-fill text-danger fw-bold icon-size2"></i>
                         <h1 class="fs-7 text-danger mx-3 pt-2">Logout</h1>
-                        <i class="fa-solid fa-chevron-right ms-auto chevron-right text-danger"></i>
+                        <i class="fa-solid fa-chevron-right ms-auto chevron-right"></i>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <div wire:ignore.self class="modal fade align-items-center" id="editProfileModal" tabindex="-1"
-        aria-labelledby="editProfileModalLabel" aria-hidden="true">
+
+    <!-- Modal untuk Foto Besar -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-0">
+                <div class="modal-body pt-2" style="width: 100%; height: 100%; object-fit: cover;">
+
+                    <!-- Gambar Besar di dalam Modal -->
+                    <img src="{{ asset('storage/' . ($image ?? 'images/profiles/default.jpg')) }}"
+                        class="img-fluid rounded mx-auto d-block mt-2 border-0 " alt="Profile"
+                        style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div wire:ignore.self class="modal fade align-items-center" id="editimageModal"
+        tabindex="-1"aria-labelledby="editimageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
-                    <h5 class="modal-title emas" id="editProfileModalLabel">Edit Profile</h5>
+                    <h5 class="modal-title emas" id="editimageModalLabel">Edit Foto Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form wire:submit.prevent="updateProfile">
+                    <form wire:submit.prevent="saveimage">
                         <div class="mb-3">
-                            <label for="name" class="form-label emas">Nama</label>
-                            <input type="text" class="form-control bg-modal" id="name"
-                                placeholder="Masukkan Nama" wire:model.defer="name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label emas">Email</label>
-                            <input type="email" class="form-control bg-modal" id="email"
-                                placeholder="Masukkan Email" wire:model.defer="email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="photo" class="form-label emas">Foto</label>
+                            <label for="photo" class="form-label emas">Unggah Foto</label>
                             <input type="file" class="form-control bg-modal" id="photo" wire:model="imageUpload">
                             @if ($imageUpload)
                                 <div class="mt-2">
@@ -228,6 +249,38 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="kuning text-white rounded py-1 px-3 border border-warning"
+                        wire:click="saveimage">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore.self class="modal fade align-items-center" id="editProfileModal" tabindex="-1"
+        aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title emas" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form wire:submit.prevent="updateProfile">
+                        <div class="mb-3">
+                            <label for="name" class="form-label emas">Nama Lengkap</label>
+                            <input type="text" class="form-control bg-modal" id="name"
+                                placeholder="Ketik di sini" wire:model.defer="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label emas">Email</label>
+                            <input type="email" class="form-control bg-modal" id="email"
+                                placeholder="Ketik di sini" wire:model.defer="email">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="kuning text-white rounded py-1 px-3 border border-warning"
                         wire:click="updateProfile">
                         Simpan
                     </button>
@@ -236,29 +289,29 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="editPasswordModal" tabindex="-1"
+    <div wire:ignore.self class="modal fade align-items-center" id="editPasswordModal" tabindex="-1"
         aria-labelledby="editPasswordModalLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
-                    <h5 class="modal-title emas" id="editPasswordModalLabel">Edit Password</h5>
+                    <h5 class="modal-title emas" id="editPasswordModalLabel">Edit Kata Sandi</h5>
                 </div>
                 <div class="modal-body">
                     <form wire:submit.prevent="updatePassword">
                         <div class="mb-3">
-                            <label for="password" class="form-label emas">Password Lama</label>
+                            <label for="password" class="form-label emas">Kata Sandi Lama</label>
                             <input type="password" class="form-control bg-modal" id="password"
-                                placeholder="Masukkan Password Lama" wire:model.defer="password">
+                                placeholder="Ketik di sini" wire:model.defer="password">
                         </div>
                         <div class="mb-3">
-                            <label for="new_password" class="form-label emas">Password Baru</label>
+                            <label for="new_password" class="form-label emas">Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="new_password"
-                                placeholder="Masukkan Password Baru" wire:model.defer="new_password">
+                                placeholder="Ketik di sini" wire:model.defer="new_password">
                         </div>
                         <div class="mb-3">
-                            <label for="confirm_password" class="form-label emas">Konfirmasi Password Baru</label>
+                            <label for="confirm_password" class="form-label emas">Konfirmasi Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="confirm_password"
-                                placeholder="Masukkan kembali Password Baru" wire:model.defer="confirm_password">
+                                placeholder="Ketik di sini" wire:model.defer="confirm_password">
                         </div>
                     </form>
                 </div>
@@ -269,35 +322,26 @@
             </div>
         </div>
     </div>
-</div>
 
-@push('scripts')
-    <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah Anda ingin keluar dari Akun ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ffd700', // Emas untuk tombol konfirmasi
-                cancelButtonColor: '#d33', // Merah untuk tombol batal
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal',
-                reverseButtons: true,
-                customClass: {
-                    cancelButton: 'swal-cancel-outline', // Kelas untuk tombol batal
-                    popup: 'swal-dark-mode', // Kelas untuk background modal
-                    title: 'swal-title-dark', // Kelas untuk judul
-                    icon: 'swal-icon-dark', // Kelas untuk ikon
-                    confirmButton: 'swal-btn-dark', // Kelas untuk tombol konfirmasi
-                    cancelButton: 'swal-btn-cancel' // Kelas untuk tombol batal
-                },
-                background: '#1c1c1c', // Dark background
-                color: '#fff' // White text color
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/login';
-                }
-            });
-        }
-    </script>
-@endpush
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered px-5">
+            <div class="modal-content bg-dark border-0">
+                <div class="modal-header border-0">
+                    <div class="d-flex justify-content-center w-100">
+                        <img src="https://cdn-icons-png.freepik.com/256/14442/14442285.png?ga=GA1.1.894313801.1732955252&semt=ais_hybrid"
+                            alt="Logout Icon" style="height: 150px; width:150px">
+                    </div>
+                </div>
+                <div class="modal-body border-0 py-1">
+                    <p class="fs-6 fw-bolder emas text-center">Apakah Anda Yakin ingin keluar dari Akun ini?</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" onclick="Livewire.dispatch('logout')">Ya,
+                        Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,7 +1,10 @@
 <?php
 
+use App\Livewire\Auth\Forgotpassword\Forgotpassword;
 use App\Livewire\Auth\Login\AuthLoginIndex as LoginAuthLoginIndex;
+use App\Livewire\Auth\Resetpassword\Resetpassword;
 use App\Livewire\Auth\Signup\Signup;
+use App\Livewire\Barber\Booking\Layanan;
 use App\Livewire\Barber\History\Riwayat as HistoryRiwayat;
 use App\Livewire\Barber\Home\Homepage;
 use App\Livewire\Barber\Home\Profile;
@@ -28,6 +31,9 @@ Route::get('/cek', function () {
 
 Route::get('/login', LoginAuthLoginIndex::class)->name('login');
 Route::get('/sign_up', Signup::class)->name('signup');
+Route::get('/forgot-password', Forgotpassword::class)->name('forgot-password');
+Route::get('/reset-password/{token}/{email}', Resetpassword::class)->name('password.reset');
+
 
 Route::get('/barber', function () {
     return view('barber');
@@ -57,6 +63,7 @@ Route::group(['namespace' => 'App\Livewire'], function () {
 
     Route::group(['namespace' => 'Barber', 'middleware' => ['role:barber']], function () {
         Route::get('/home_barber', Homepage::class)->name('home_barber');
+        Route::get('/layanan_barber', Layanan::class)->name('layanan_barber');
         Route::get('/tren_detail_barber/{id}', HomeTrendetail::class)->name('tren_detail_barber');
         Route::get('/history_barber', HistoryRiwayat::class)->name('history_barber');
         Route::get('/profile_barber', Profile::class)->name('profile_barber');

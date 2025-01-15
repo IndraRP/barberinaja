@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(BarberSchedule::class, 'barber_id');
     }
+
+    public function discounts()
+    {
+        return $this->hasMany(UserDiscount::class);
+    }
+
 
     // Relasi dengan Transactions
     public function transactions()

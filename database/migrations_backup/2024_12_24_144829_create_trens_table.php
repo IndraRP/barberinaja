@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('image')->nullable(); // Gambar profil barber
+            $table->string('image')->nullable(); 
+            $table->enum('status', ['active', 'blocked'])->default('active');
             $table->timestamps();
         });
     }

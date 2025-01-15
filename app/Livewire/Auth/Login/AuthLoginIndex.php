@@ -26,22 +26,21 @@ class AuthLoginIndex extends Component
             'email' => 'required|email',
             'password' => 'required|min:8',
         ], $this->messages);
-    
+
         $user = User::where('email', $this->email)->first();
-    
+
         if (!$user || !Hash::check($this->password, $user->password)) {
-            // Menggunakan session flash untuk menyimpan pesan kesalahan
-            session()->flash('error', 'Email atau password salah!');
-            return; // Tidak perlu menampilkan alert
+            // Menampilkan alert jika login gagal
+            $this->alert('error', 'Email atau password salah!');
+            return;
         }
-    
+
         // Login berhasil
         Auth::login($user, $this->remember);
-    
+
         // Redirect berdasarkan role
         return $this->redirectBasedOnRole($user);
     }
-    
 
     private function redirectBasedOnRole($user)
     {

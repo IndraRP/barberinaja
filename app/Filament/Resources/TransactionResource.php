@@ -83,14 +83,20 @@ class TransactionResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('details.service.name')
+                    ->label('Nama Layanan')
+                    ->sortable(),
+
                 TextColumn::make('phone_number')
                     ->label('Phone Number')
                     ->sortable(),
 
                 ImageColumn::make('bukti_image')
                     ->label('Bukti Transaksi')
+                    ->url(fn($record) => asset('storage/' . $record->bukti_image), true) // true untuk membuka di tab baru
                     ->disk('public')
-                    ->height(100),
+                    ->height(100)
+                    ->width(80),
 
                 TextColumn::make('barber.name')
                     ->label('Barber Name')
@@ -116,10 +122,32 @@ class TransactionResource extends Resource
                 TextColumn::make('time')
                     ->label('Jam Dilayani')
                     ->sortable(),
+
+                TextColumn::make('created_at')
+                    ->label('Jam Pesan')
+                    ->sortable(),
+            ])
+            ->filters([
+                // Filter untuk status
+                \Filament\Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'completed' => 'Completed',
+                        'canceled' => 'Canceled',
+                    ])
+                    ->default('pending'), // Default filter untuk menampilkan 'pending'
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->icon('heroicon-o-pencil-square')
+                    ->label(''),
+
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->label(''), // Menghapus label agar hanya ikon yang ditampilkan
+
                 Action::make('approve')
                     ->label('Approve')
                     ->action(function ($record) {
@@ -171,7 +199,10 @@ class TransactionResource extends Resource
                             ->send();
                     })
                     ->icon('heroicon-o-trash'),
-            ])->modifyQueryUsing(fn ($query) => $query->latest());
+            ])
+            ->modifyQueryUsing(fn($query) => $query->when(request()->input('filters')['status'] ?? null, function ($query, $status) {
+                return $query->where('status', $status);
+            })->latest());
     }
 
     public static function getRelations(): array

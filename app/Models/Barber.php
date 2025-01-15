@@ -10,5 +10,5 @@ class Barber extends Model
     use HasFactory;
 
     // Tentukan kolom yang bisa diisi
-    protected $fillable = ['name', 'email', 'phone', 'description', 'image'];
+    protected $fillable = ['name', 'email', 'phone', 'description', 'image','status'];
 }

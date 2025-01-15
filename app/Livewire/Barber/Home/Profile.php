@@ -5,9 +5,9 @@ namespace App\Livewire\Barber\Home;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Rule;
 use Livewire\Component;
-use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\WithFileUploads;
+use Illuminate\Validation\Rule;
 
 class Profile extends Component
 {
@@ -23,6 +23,8 @@ class Profile extends Component
     public $image; 
     public $imageUpload;
 
+    protected $listeners = ['logout'];
+
     public function mount()
     {
         // Pastikan user sudah login
@@ -37,6 +39,7 @@ class Profile extends Component
         $this->image = $this->user->image;
     }
 
+    
     public function updateProfile()
     {
         $validatedData = $this->validate([
@@ -45,7 +48,25 @@ class Profile extends Component
             'phone_number' => 'nullable|string|max:255',
             'password' => 'nullable|current_password',
             'new_password' => 'nullable|string|min:8|same:confirm_password',
-            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:1024', // Validasi format file
+        ]);
+
+        // Perbarui data pengguna
+        $this->user->update([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+        ]);
+
+        // Tambahkan flash message
+        session()->flash('message', 'Profil berhasil diperbarui!');
+        return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+    }
+
+
+
+    public function saveimage(){
+           $validatedData = $this->validate([
+            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp,|max:2024', // Validasi format file
         ]);
 
         if ($this->imageUpload) {
@@ -60,9 +81,6 @@ class Profile extends Component
 
         // Perbarui data pengguna
         $this->user->update([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
             'image' => $this->image,
         ]);
 
@@ -84,8 +102,16 @@ class Profile extends Component
             'password' => Hash::make($this->new_password),
         ]);
 
-        // Tambahkan flash message
-        session()->flash('message', 'Password berhasil diperbarui!');
+         // Tambahkan flash message
+         session()->flash('message', 'Password berhasil diperbarui!');
+         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+    }
+
+    
+    public function logout()
+    {
+        Auth::logout(); // Logout user
+        return redirect('/home_barber');
     }
 
     public function render()

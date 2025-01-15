@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('description')->nullable();
             $table->string('image');
+            $table->enum('status', ['active', 'blocked'])->default('active');
             $table->timestamps();
         });
     }

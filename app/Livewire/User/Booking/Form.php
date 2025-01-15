@@ -8,19 +8,24 @@ use App\Models\Barber;
 use App\Models\BarberSchedule;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Form extends Component
 {
+    use LivewireAlert;
+
     public $name;
     public $phone_number;
     public $barber_id;
     public $tanggal;
     public $time;
     public $times = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'];
+    public $disabledDates = [];
     public $barbers = [];
     public $takenTimes = [];
 
-    public function mount($id)
+    public function mount($id) 
     {
         $this->barbers = Barber::whereBetween('id', [28, 32])->get();
 
@@ -52,39 +57,59 @@ class Form extends Component
         'time.required' => 'Silakan pilih waktu.',
     ];
 
-
-
     public function updatedTanggal()
     {
         $this->loadTakenTimes();
     }
 
-    public function loadTakenTimes()
+    public function updatedBarberId()
     {
+        $this->loadTakenTimes();
+    }
+
+    
+  public function loadTakenTimes()
+    {
+        // Mengambil semua transaksi yang sudah ada untuk barber dan tanggal yang dipilih
         $this->takenTimes = Transaction::where('barber_id', $this->barber_id)
             ->whereDate('appointment_date', $this->tanggal)
-            ->whereIn('status', ['pending', 'approved']) // Filter status pending dan approved
+            ->whereIn('status', ['pending', 'approved'])
             ->pluck('time')
             ->map(function ($time) {
-                return \Carbon\Carbon::parse($time)->format('H:i');
+                return Carbon::parse($time)->format('H:i');
             })
             ->toArray();
+    
+        // Memeriksa jika tanggal yang dipilih adalah hari ini atau besok
+        if ($this->tanggal !== null ? Carbon::parse($this->tanggal)->isToday() : false) {
+
+            // Jika hari ini, tampilkan waktu yang masih tersedia setelah waktu sekarang
+            $this->takenTimes = array_merge($this->takenTimes, collect($this->times)->filter(function ($time) {
+                // Pastikan waktu belum terambil dan lebih besar atau sama dengan waktu sekarang
+                return in_array($time, $this->takenTimes) || Carbon::parse($time)->format('H:i') < Carbon::now()->format('H:i');
+            })->values()->toArray());
+
+            
+        } else {
+            $this->takenTimes = array_merge($this->takenTimes, collect($this->times)->filter(function ($time) {
+                // Pastikan waktu belum terambil dan lebih besar atau sama dengan waktu sekarang
+                return in_array($time, $this->takenTimes) ;
+            })->values()->toArray());
+        }
     }
+    
 
 
     public function setTime($selectedTime)
     {
-        logger("Waktu dipilih: " . $selectedTime);
         $this->time = $selectedTime;
     }
 
     public function submitBooking()
     {
-        // dd($this->barber_id);
         $this->tanggal = date('Y-m-d 00:00:00', strtotime($this->tanggal));
         $this->validate();
 
-        // Cek apakah sudah ada jadwal dengan status pending pada tanggal dan waktu yang dipilih
         $existingSchedule = BarberSchedule::where('barber_id', $this->barber_id)
             ->where('day', $this->tanggal)
             ->where('start_time', $this->time)
@@ -92,7 +117,7 @@ class Form extends Component
             ->first();
 
         if ($existingSchedule) {
-            session()->flash('error', 'Barber ini sudah memiliki jadwal pada waktu yang dipilih Silahkan Ubah Waktu.');
+            $this->alert('error', 'Jadwal sudah diambil.');
             return;
         }
 
@@ -108,25 +133,19 @@ class Form extends Component
             'time' => $this->time,
         ];
 
-        // Simpan data pemesanan ke sesi
         session(['detail' => $session]);
 
-        session()->flash('success', 'Pemesanan berhasil dilakukan.');
-        // dd(session()->all());
+        $this->alert('success', 'Form Berhasil Disimpan, Lanjutkan.');
         return redirect("/metodepembayaran");
     }
 
-
-
     public function render()
     {
-
         return view('livewire.user.booking.form')
             ->extends('layouts.app')
             ->section('content');
     }
 }
-
 
 
 // public function updatedBarberId()

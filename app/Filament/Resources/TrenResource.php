@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TrenResource\Pages;
@@ -21,7 +22,7 @@ class TrenResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
     protected static ?string $navigationLabel = 'Tren';
     protected static ?string $pluralLabel = 'Tren';
-    protected static ?string $navigationGroup = 'Layanan dan Tren';
+    protected static ?string $navigationGroup = 'Isi Page';
 
     /**
      * Form untuk membuat dan mengedit tren.
@@ -48,8 +49,15 @@ class TrenResource extends Resource
                     ->nullable()
                     ->rules('image', 'max:2048')
                     ->previewable(true),
+
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'active' => 'Active',
+                        'blocked' => 'Blocked',
+                    ])
             ]);
-    } 
+    }
 
     /**
      * Table untuk menampilkan daftar tren.
@@ -65,16 +73,33 @@ class TrenResource extends Resource
                 ImageColumn::make('image')
                     ->label('Gambar Tren')
                     ->disk('public')
-                    ->height(150),
+                    ->height(80)
+                    ->width(80),
 
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime()
                     ->sortable(),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->sortable()
+                    ->getStateUsing(function ($record) {
+                        return [
+                            'active' => 'Active',
+                            'blocked' => 'Blocked',
+                        ][$record->status] ?? 'Unknown';
+                    }),
+
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->icon('heroicon-o-pencil-square')
+                    ->label(''),
+
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->label(''),
             ]);
     }
 

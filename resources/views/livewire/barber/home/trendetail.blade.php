@@ -1,5 +1,34 @@
 @section('title', 'Booking Detail')
 
+@section('styles')
+    <style>
+        .kuning1 {
+            background-color: #7c6727b9;
+        }
+
+        #header {
+            background-color: transparent;
+            /* Default background */
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+            /* Transisi untuk latar belakang */
+        }
+
+        #header.scrolled a {
+            background-color: #00000000;
+        }
+
+        #header.scrolled {
+            background-color: #212529 !important;
+            /* Tambahkan !important untuk memastikan aturan CSS diterapkan */
+        }
+
+        .abu1 {
+            background-color: #2d30338b;
+        }
+    </style>
+@endsection
+
 <div class="pb-5 mb-3">
     <section class="mb-3">
         <div class="pb-1">
@@ -38,16 +67,18 @@
                 <div style="display: inline-flex; min-width: 100%; width: fit-content;">
                     @foreach ($services as $service)
                         {{-- Memeriksa apakah ID layanan tidak sama dengan ID yang ada di route URL saat ini --}}
-                        @if ($service->id != request()->segment(2)) {{-- Gunakan segment(2) jika ID ada di posisi kedua URL --}}
+                        @if ($service->id != request()->segment(2))
+                            {{-- Gunakan segment(2) jika ID ada di posisi kedua URL --}}
                             <div
                                 style="flex-shrink: 0; width: 170px; {{ $loop->last ? '' : 'margin-right: 10px;' }} position: relative;">
                                 <!-- Link ke halaman detail -->
                                 <a href="/tren_detail_barber/{{ $service->id }}" style="display: block;">
                                     <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}"
-                                         class="rounded d-block"
-                                         style="height: 150px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
-        
-                                    <div class="position-absolute bottom-0 start-0 text-white bg-dark bg-opacity-50 fs-9 w-100 text-center p-1">
+                                        class="rounded d-block"
+                                        style="height: 150px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
+
+                                    <div
+                                        class="position-absolute bottom-0 start-0 text-white bg-dark bg-opacity-50 fs-9 w-100 text-center p-1">
                                         <p class="mb-0">{{ $service->name }}</p>
                                         <p class="mb-0 emas">Rp {{ number_format($service->price, 0, ',', '.') }}</p>
                                     </div>
@@ -60,7 +91,7 @@
         </section>
     </section>
 
-  
+
     <!-- Header dengan Tombol Kembali -->
     <div id="header" class="position-fixed w-100 top-0 start-0 bg-transparent transition-all">
         <div class="d-flex justify-content-between align-items-center p-2">
@@ -76,33 +107,9 @@
         </div>
     </div>
 
-    <style>
-        .kuning1 {
-            background-color: #7c6727b9;
-        }
+</div>
 
-        #header {
-            background-color: transparent;
-            /* Default background */
-            z-index: 1000;
-            transition: background-color 0.3s ease;
-            /* Transisi untuk latar belakang */
-        }
-
-        #header.scrolled a {
-            background-color: #00000000;
-        }
-
-        #header.scrolled {
-            background-color: #212529 !important;
-            /* Tambahkan !important untuk memastikan aturan CSS diterapkan */
-        }
-
-        .abu1 {
-            background-color: #2d30338b;
-        }
-    </style>
-
+@push('scripts')
     <script>
         window.addEventListener('scroll', function() {
             const header = document.getElementById('header');
@@ -113,4 +120,4 @@
             }
         });
     </script>
-</div>
+@endpush

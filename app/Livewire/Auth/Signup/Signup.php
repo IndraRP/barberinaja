@@ -5,10 +5,11 @@ namespace App\Livewire\Auth\Signup;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Signup extends Component
 {
-
+    use LivewireAlert; // Tambahkan trait ini
     public $name, $email, $phone_number, $password, $password_confirmation, $role = 'customer';
 
     protected $rules = [
@@ -32,7 +33,7 @@ class Signup extends Component
             'role' => $this->role,
         ]);
 
-        session()->flash('message', 'Sign up successful! Please login.');
+        $this->alert('success', 'Daftar Berhasil! Silahkan Login.');
         return redirect()->route('login');
     }
 

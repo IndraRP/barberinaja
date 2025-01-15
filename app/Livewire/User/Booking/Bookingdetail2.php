@@ -16,6 +16,8 @@ class Bookingdetail2 extends Component
     // Method mount menerima parameter serviceId dari route
     public function mount($serviceId)
     {
+        //dd(session()->all());
+
         $this->serviceId = $serviceId;
         $this->service = Service::findOrFail($this->serviceId);
         $this->services = Service::all();

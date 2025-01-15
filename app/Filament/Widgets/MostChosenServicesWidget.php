@@ -2,37 +2,42 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DetailTransaction;
+use App\Models\Barber;
 use App\Models\Service;
+use App\Models\Transaction;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
 class MostChosenServicesWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Layanan Terpopuler';
+    protected static ?string $heading = 'Barber Terpopuler';
 
     protected function getData(): array
     {
-        // Menghitung jumlah pemilihan setiap service berdasarkan detail transaksi
-        $serviceCounts = DetailTransaction::select('service_id', DB::raw('count(*) as count'))
-                                          ->groupBy('service_id')
+        $barberCounts = Transaction::select('barber_id', DB::raw('count(*) as count'))
+                                          ->groupBy('barber_id')
                                           ->orderByDesc('count')
                                           ->get();
 
         // Memetakan data untuk chart
-        $labels = $serviceCounts->map(fn($item) => Service::find($item->service_id)->name)->toArray();
-        $data = $serviceCounts->map(fn($item) => $item->count)->toArray();
+        $labels = $barberCounts->map(fn($item) => Barber::find($item->barber_id)->name)->toArray();
+        $data = $barberCounts->map(fn($item) => $item->count)->toArray();
 
         // Menyiapkan data untuk chart
         return [
             'datasets' => [
                 [
-                    'label' => 'Most Chosen Services',
+                    'label' => 'Barber Terpopuler',
                     'data' => $data,
-                    'backgroundColor' => '#4CAF50',  // Ganti dengan warna yang diinginkan
+                    'backgroundColor' => [ 
+                        '#C40C0C',
+                        '#FF8A08',
+                        '#FF6500',                       
+                        '#FFC100',
+                    ],
                 ],
             ],
-            'labels' => $labels,  // Menampilkan nama service pada label
+            'labels' => $labels, 
         ];
     }
 

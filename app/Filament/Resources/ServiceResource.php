@@ -22,7 +22,7 @@ class ServiceResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationLabel = 'Layanan';
     protected static ?string $pluralLabel = 'Layanan';
-    protected static ?string $navigationGroup = 'Layanan dan Tren';
+    protected static ?string $navigationGroup = 'Isi Page';
 
     /**
      * Form untuk membuat dan mengedit service.
@@ -56,6 +56,13 @@ class ServiceResource extends Resource
                     ->nullable()
                     ->rules('image', 'max:2048')
                     ->previewable(true),
+
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'active' => 'Active',
+                        'blocked' => 'Blocked',
+                    ])
             ]);
     }
 
@@ -77,16 +84,34 @@ class ServiceResource extends Resource
                 \Filament\Tables\Columns\ImageColumn::make('image')
                     ->label('Gambar Layanan')
                     ->disk('public')
-                    ->height(150),
+                    ->height(80)
+                    ->width(80),
 
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime()
                     ->sortable(),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->sortable()
+                    ->getStateUsing(function ($record) {
+                        return [
+                            'active' => 'Active',
+                            'blocked' => 'Blocked',
+                        ][$record->status] ?? 'Unknown';
+                    }),
+
+
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->icon('heroicon-o-pencil-square')
+                    ->label(''),
+
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->label(''),
             ])
             ->filters([
                 // Tambahkan filter jika diperlukan

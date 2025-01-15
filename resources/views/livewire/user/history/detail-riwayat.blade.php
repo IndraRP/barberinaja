@@ -1,3 +1,5 @@
+@section('title', 'Detail Riwayat')
+
 <div class="detail_riwayat">
     <!-- Bagian header -->
     <div class="d-flex justify-content-center abu fixed py-4 align-items-center position-relative">
@@ -41,7 +43,7 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center p-1">
                     <p class="fs-10 m-0 text-white">Jam Dipilih</p>
-                    <p class="fs-10 m-0 text-white">{{ $transaction->time }}</p>
+                    <p class="fs-10 m-0 text-white"> {{ \Carbon\Carbon::parse($transaction->time)->format('H:i') }}</p>
                 </div>
             </div>
         </div>
@@ -102,11 +104,12 @@
             <div class="d-flex justify-content-center align-items-center mt-2">
                 <img src="{{ asset('storage/' . $transaction->bukti_image ?? 'https://via.placeholder.com/70') }}"
                     alt="Service Image" class="mt-1 img-fluid rounded border border-white"
-                    style="height: 70px; width: 70px; object-fit: cover;">
+                    style="height: 70px; width: 70px; object-fit: cover;"data-bs-toggle="modal"
+                    data-bs-target="#buktiModal">
 
                 <div class="d-block text-end ms-auto">
                     <p class="fs-10 m-0 text-white fw-bolder">Metode Pembayaran</p>
-                    <p class="fs-10 m-0 text-white">Transfer {{ $transaction->payment_method ?? 'BRI' }}</p>
+                    <p class="fs-10 m-0 text-white">Transfer BRI</p>
                 </div>
             </div>         
 
@@ -118,4 +121,18 @@
 
         </div>
     </section>
+
+     <!-- Modal untuk Foto Besar -->
+     <div class="modal fade" id="buktiModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-0">
+                <div class="modal-body p-3">
+                    <!-- Gambar Besar di dalam Modal -->
+                    <img src="{{ asset('storage/' . $transaction->bukti_image ?? 'default1.jpg') }}"
+                        class="img-fluid rounded mx-auto d-block" alt="Profile">
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

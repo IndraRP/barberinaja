@@ -20,6 +20,7 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $pluralLabel = 'Customer User';
     protected static ?string $navigationGroup = 'User';
 
     // Form untuk create dan edit
@@ -50,20 +51,18 @@ class UserResource extends Resource
                 Forms\Components\Select::make('role')
                     ->label('Peran')
                     ->options([
-                        'owner' => 'Owner',
-                        'barber' => 'Barber',
-                        'customer' => 'Customer',
+                        'customer' => 'Customer', // Hanya role customer yang bisa dipilih
                     ])
                     ->default('customer')
                     ->required(),
-                FileUpload::make('image')
-                    ->label('Gambar Profil')
-                    ->image()
-                    ->disk('public')
-                    ->directory('images/profiles')
-                    ->nullable()
-                    ->rules('image', 'max:2048') // Maksimal 2MB
-                    ->previewable(true),
+                // FileUpload::make('image')
+                //     ->label('Gambar Profil')
+                //     ->image()
+                //     ->disk('public')
+                //     ->directory('images/profiles')
+                //     ->nullable()
+                //     ->rules('image', 'max:2048')
+                //     ->previewable(true),
             ]);
     }
 
@@ -75,12 +74,7 @@ class UserResource extends Resource
                 TextColumn::make('id')->label('ID')->sortable(),
                 TextColumn::make('name')->label('Nama')->searchable(),
                 TextColumn::make('email')->label('Email')->searchable(),
-                // Menambahkan kolom phone_number di tabel
-                TextColumn::make('phone_number')
-                    ->label('Nomor Handphone')
-                    ->searchable()
-                    ->sortable(),
-
+                TextColumn::make('phone_number')->label('Nomor Handphone')->searchable()->sortable(),
                 BadgeColumn::make('role')
                     ->label('Peran')
                     ->color(function ($state) {
@@ -92,22 +86,27 @@ class UserResource extends Resource
                         };
                     }),
                 TextColumn::make('created_at')->label('Dibuat Pada')->dateTime(),
-                // Menampilkan gambar di tabel
                 \Filament\Tables\Columns\ImageColumn::make('image')
                     ->label('Gambar Profil')
                     ->disk('public')
-                    ->height(150),
+                    ->height(80)
+                    ->width(80),
             ])
             ->filters([
-                // Filter jika diperlukan
+                Tables\Filters\SelectFilter::make('role')
+                    ->label('Peran')
+                    ->options([
+                        'customer' => 'Customer',
+                    ])
+                    ->default('customer'),
             ])
             ->actions([
-                EditAction::make(),
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
     }
+
 
     public static function getRelations(): array
     {

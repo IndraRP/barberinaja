@@ -13,5 +13,5 @@ class Tren extends Model
     protected $table = 'tren';
 
     // Daftar atribut yang dapat diisi
-    protected $fillable = ['name', 'description', 'image'];
+    protected $fillable = ['name', 'description', 'image','status'];
 }

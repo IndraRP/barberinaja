@@ -54,7 +54,8 @@
             'konfirmasi',
             'login',
             'signup',
-            'trendetail'
+            'trendetail',
+            'forgot-password',
         ]))
         @include('layouts.navbar')
     @endif
@@ -79,7 +80,12 @@
 
     @stack('scripts')
     @livewireScripts
-    <script>
+
+    
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <x-livewire-alert::scripts />
+
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname;
 
@@ -130,7 +136,7 @@
                 }
             });
 
-        });
+        }); --}}
     </script>
 </body>
 

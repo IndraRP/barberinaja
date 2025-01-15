@@ -20,7 +20,7 @@ class Profil extends Component
     public $password;
     public $new_password;
     public $confirm_password;
-    public $image; 
+    public $image;
     public $imageUpload;
 
     protected $listeners = ['logout'];
@@ -39,6 +39,7 @@ class Profil extends Component
         $this->image = $this->user->image;
     }
 
+
     public function updateProfile()
     {
         $validatedData = $this->validate([
@@ -47,6 +48,27 @@ class Profil extends Component
             'phone_number' => 'nullable|string|max:255',
             'password' => 'nullable|current_password',
             'new_password' => 'nullable|string|min:8|same:confirm_password',
+        ]);
+
+        // Perbarui data pengguna
+        $this->user->update([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+        ]);
+
+        // Tambahkan flash message
+        $this->alert('success', 'Berhasil!', [
+            'text' => 'Profile Berhasil di Perbarui.'
+        ]);
+        return redirect()->route('profile');
+    }
+
+
+
+    public function saveimage()
+    {
+        $validatedData = $this->validate([
             'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp,|max:2024', // Validasi format file
         ]);
 
@@ -62,9 +84,6 @@ class Profil extends Component
 
         // Perbarui data pengguna
         $this->user->update([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
             'image' => $this->image,
         ]);
 
@@ -86,12 +105,12 @@ class Profil extends Component
             'password' => Hash::make($this->new_password),
         ]);
 
-         // Tambahkan flash message
-         session()->flash('message', 'Password berhasil diperbarui!');
-         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+        // Tambahkan flash message
+        session()->flash('message', 'Password berhasil diperbarui!');
+        return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
     }
 
-    
+
     public function logout()
     {
         Auth::logout(); // Logout user

@@ -1,6 +1,36 @@
 @section('title', 'Booking Detail')
 
-<div class="pb-5 mb-3">
+@section('styles')
+
+    <style>
+        .kuning1 {
+            background-color: #7c6727b9;
+        }
+
+        #header {
+            background-color: transparent;
+            /* Default background */
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+            /* Transisi untuk latar belakang */
+        }
+
+        #header.scrolled a {
+            background-color: #00000000;
+        }
+
+        #header.scrolled {
+            background-color: #212529 !important;
+            /* Tambahkan !important untuk memastikan aturan CSS diterapkan */
+        }
+
+        .abu1 {
+            background-color: #2d30338b;
+        }
+    </style>
+@endsection
+
+<div class="pb-5 mb-4">
     <section class="">
         <div class="pb-1">
             <div style="position: relative;">
@@ -80,10 +110,10 @@
 
     <!-- Header dengan Tombol Kembali -->
     <div id="header" class="position-fixed w-100 top-0 start-0 bg-transparent transition-all">
-        <div class="d-flex justify-content-between align-items-center p-2">
+        <div class="d-flex justify-content-between align-items-center p-1">
             <!-- Tombol Kembali -->
             <div class="d-flex align-items-center">
-                <a href="/booking" id="backButton" class="text-white abu rounded-circle p-2 ms-2 my-1">
+                <a href="/booking" id="backButton" class="text-white abu rounded-circle p-2 my-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
@@ -92,11 +122,14 @@
                     </svg>
                 </a>
                 <!-- Text Detail Layanan -->
-                <p id="detailText" class="text-white fs-5 mt-3 fw-bolder ms-2 d-none">Detail Layanan</p>
+                <p id="detailText" class="text-white fs-6 mt-3 fw-bolder ms-2 d-none">Detail Layanan</p>
             </div>
         </div>
     </div>
 
+</div>
+
+@push('scripts')
     <script>
         window.addEventListener('scroll', function() {
             const header = document.getElementById('header');
@@ -111,32 +144,4 @@
             }
         });
     </script>
-
-
-    <style>
-        .kuning1 {
-            background-color: #7c6727b9;
-        }
-
-        #header {
-            background-color: transparent;
-            /* Default background */
-            z-index: 1000;
-            transition: background-color 0.3s ease;
-            /* Transisi untuk latar belakang */
-        }
-
-        #header.scrolled a {
-            background-color: #00000000;
-        }
-
-        #header.scrolled {
-            background-color: #212529 !important;
-            /* Tambahkan !important untuk memastikan aturan CSS diterapkan */
-        }
-
-        .abu1 {
-            background-color: #2d30338b;
-        }
-    </style>
-</div>
+@endpush

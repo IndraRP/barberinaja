@@ -21,7 +21,7 @@ class BarberResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Barber';
     protected static ?string $pluralLabel = 'Barbers';
-    protected static ?string $navigationGroup = 'Barber';
+    protected static ?string $navigationGroup = 'Isi Page';
 
     /**
      * Form untuk membuat dan mengedit barber.
@@ -58,6 +58,14 @@ class BarberResource extends Resource
                     ->nullable()
                     ->rules('image', 'max:2048')
                     ->previewable(true),
+
+
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'active' => 'Active',
+                        'blocked' => 'Blocked',
+                    ])
             ]);
     }
 
@@ -77,16 +85,29 @@ class BarberResource extends Resource
                 ImageColumn::make('image')
                     ->label('Gambar Profil')
                     ->disk('public')
-                    ->height(150),
+                    ->height(80)
+                    ->width(80),
 
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime()
                     ->sortable(),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->sortable()
+                    ->getStateUsing(fn($record) => $record->status === 'active' ? 'Active' : ($record->status === 'blocked' ? 'Blocked' : 'Unknown')),
+
+
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->icon('heroicon-o-pencil-square')
+                    ->label(''),
+
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->label(''), // Menghapus label agar hanya ikon yang ditampilkan
             ]);
     }
 
