@@ -9,7 +9,7 @@ class BarberSchedule extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['barber_id', 'day', 'start_time', 'end_time', 'status', 'transaction_id'];
+    protected $fillable = ['barber_id', 'day', 'start_time', 'end_time', 'status', 'transaction_id', 'delayed_until'];
 
     public function barber()
     {
@@ -20,7 +20,4 @@ class BarberSchedule extends Model
     {
         return $this->belongsTo(Transaction::class, 'transaction_id');
     }
-
-
-
 }

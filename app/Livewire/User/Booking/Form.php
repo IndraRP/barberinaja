@@ -25,7 +25,7 @@ class Form extends Component
     public $barbers = [];
     public $takenTimes = [];
 
-    public function mount($id) 
+    public function mount($id)
     {
         $this->barbers = Barber::whereBetween('id', [28, 32])->get();
 
@@ -41,22 +41,6 @@ class Form extends Component
         }
     }
 
-    protected $rules = [
-        'name' => 'required|string|max:255',
-        'phone_number' => 'required|numeric',
-        'barber_id' => 'required|exists:barbers,id',
-        'tanggal' => 'required|date',
-        'time' => 'required|string',
-    ];
-
-    protected $messages = [
-        'name.required' => 'Nama wajib diisi.',
-        'phone_number.required' => 'Nomor telepon wajib diisi.',
-        'barber_id.required' => 'Silakan pilih barber.',
-        'tanggal.required' => 'Tanggal wajib diisi.',
-        'time.required' => 'Silakan pilih waktu.',
-    ];
-
     public function updatedTanggal()
     {
         $this->loadTakenTimes();
@@ -67,8 +51,8 @@ class Form extends Component
         $this->loadTakenTimes();
     }
 
-    
-  public function loadTakenTimes()
+
+    public function loadTakenTimes()
     {
         // Mengambil semua transaksi yang sudah ada untuk barber dan tanggal yang dipilih
         $this->takenTimes = Transaction::where('barber_id', $this->barber_id)
@@ -79,7 +63,7 @@ class Form extends Component
                 return Carbon::parse($time)->format('H:i');
             })
             ->toArray();
-    
+
         // Memeriksa jika tanggal yang dipilih adalah hari ini atau besok
         if ($this->tanggal !== null ? Carbon::parse($this->tanggal)->isToday() : false) {
 
@@ -88,17 +72,13 @@ class Form extends Component
                 // Pastikan waktu belum terambil dan lebih besar atau sama dengan waktu sekarang
                 return in_array($time, $this->takenTimes) || Carbon::parse($time)->format('H:i') < Carbon::now()->format('H:i');
             })->values()->toArray());
-
-            
         } else {
             $this->takenTimes = array_merge($this->takenTimes, collect($this->times)->filter(function ($time) {
                 // Pastikan waktu belum terambil dan lebih besar atau sama dengan waktu sekarang
-                return in_array($time, $this->takenTimes) ;
+                return in_array($time, $this->takenTimes);
             })->values()->toArray());
         }
     }
-    
-
 
     public function setTime($selectedTime)
     {
@@ -107,9 +87,14 @@ class Form extends Component
 
     public function submitBooking()
     {
-        $this->tanggal = date('Y-m-d 00:00:00', strtotime($this->tanggal));
-        $this->validate();
 
+        if ($this->phone_number && strlen($this->phone_number) < 10) {
+            $this->alert('error', 'Nomor telepon harus terdiri antara 10 hingga 13 angka.');
+            return;
+        }
+
+        // Menangani validasi secara langsung, jika gagal, akan otomatis mengarah ke error
+        // Jika validasi berhasil, lanjutkan dengan pemesanan
         $existingSchedule = BarberSchedule::where('barber_id', $this->barber_id)
             ->where('day', $this->tanggal)
             ->where('start_time', $this->time)
@@ -118,7 +103,7 @@ class Form extends Component
 
         if ($existingSchedule) {
             $this->alert('error', 'Jadwal sudah diambil.');
-            return;
+            return; // Jangan lanjutkan jika jadwal sudah ada
         }
 
         $barber = Barber::find($this->barber_id);

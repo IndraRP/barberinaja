@@ -62,6 +62,7 @@ class TransactionResource extends Resource
                         'pending' => 'Menunggu Konfirmasi',
                         'approved' => 'Menunggu Hari',
                         'completed' => 'Selesai',
+                        'arrived' => 'Datang',
                         'canceled' => 'Dibatalkan',
                     ])
                     ->default('pending')
@@ -135,6 +136,7 @@ class TransactionResource extends Resource
                         'pending' => 'Pending',
                         'approved' => 'Approved',
                         'completed' => 'Completed',
+                        'arrived' => 'Arrived',
                         'canceled' => 'Canceled',
                     ])
                     ->default('pending'), // Default filter untuk menampilkan 'pending'

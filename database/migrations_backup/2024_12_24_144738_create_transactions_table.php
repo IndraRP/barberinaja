@@ -19,7 +19,7 @@ return new class extends Migration
             $table->bigInteger('phone_number')->nullable();
             $table->date('appointment_date');
             $table->time('time')->nullable();
-            $table->enum('status', ['pending', 'approved', 'completed', 'canceled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'completed', 'canceled','arrived'])->default('pending');
             $table->string('bukti_image')->nullable();
             $table->enum('status', ['BRI', 'BNI', 'BCA']);
             $table->timestamps();

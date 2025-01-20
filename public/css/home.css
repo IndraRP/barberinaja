@@ -2,6 +2,10 @@ body {
     font-family: "Ubuntu", sans-serif;
 }
 
+.no-right-click {
+    pointer-events: none;
+}
+
 .home {
     padding-top: 58px;
     padding-bottom: 70px;

@@ -1,0 +1,183 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Navbar</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --clr: #fff;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: var(--clr);
+            }
+
+            .navigation {
+                width: 420px;
+                height: 70px;
+                background: #209cff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+            }
+
+            .navigation ul {
+                position: relative;
+                display: flex;
+                width: 350px;
+            }
+
+            .navigation ul li {
+                position: relative;
+                list-style: none;
+                width: 70px;
+                height: 70px;
+                height: 100px;
+                z-index: 1;
+            }
+
+            .navigation ul li a {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+            }
+
+            .navigation ul li a .icon {
+                position: relative;
+                display: block;
+                font-size: 1.5em;
+                color: #fff;
+                line-height: 75px;
+                opacity: 0.75;
+                transition: 0.5s;
+            }
+
+            .navigation ul li.active a .icon {
+                opacity: 1;
+                color: #209cff;
+                transform: translateY(-8px);
+            }
+
+            .indicator {
+                position: absolute;
+                top: -10px;
+                width: 70px;
+                height: 70px;
+                background: var(--clr);
+                border-bottom-left-radius: 35px;
+                border-bottom-right-radius: 35px;
+                border: 6px solid var(--clr);
+                cursor: pointer;
+                transition: 0.5s;
+            }
+
+            .indicator::before,
+            .indicator::after {
+                content: "";
+                position: absolute;
+                top: 4px;
+                width: 20px;
+                height: 20px;
+                background: transparent;
+            }
+
+            .indicator::before {
+                left: -25.75px;
+                border-top-right-radius: 20px;
+                box-shadow: 4px -6px 0 2px var(--clr);
+            }
+
+            .indicator::after {
+                right: -25.75px;
+                border-top-left-radius: 20px;
+                box-shadow: -4px -6px 0 2px var(--clr);
+            }
+
+            .indicator span {
+                position: absolute;
+                left: -1px;
+                width: 60px;
+                height: 60px;
+                border: 4px solid #209cff;
+                border-radius: 50%;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+                transform: scale(0.85);
+            }
+
+            @media (max-width: 480px) {
+                .navigation {
+                    zoom: 0.8;
+                }
+            }
+
+            @media (max-width: 330px) {
+                .navigation {
+                    zoom: 0.7;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navigation">
+            <ul>
+                <script>
+                    let icons = [
+                        "home",
+                        "person",
+                        "chatbubble",
+                        "camera",
+                        "settings",
+                    ];
+                    for (let i of icons) {
+                        document.write(
+                            `<li><a href="#"><span class="icon"><ion-icon name="${i}-outline"></ion-icon></span></a></li>`
+                        );
+                    }
+                </script>
+                <div class="indicator"><span></span></div>
+            </ul>
+        </div>
+
+        <script>
+            let list = document.querySelectorAll(".navigation li");
+            list[0].classList.add("active");
+
+            function activeLink() {
+                list.forEach((item) => item.classList.remove("active"));
+                this.classList.add("active");
+            }
+
+            list.forEach((item) => item.addEventListener("click", activeLink));
+
+            let indicatorRules = () => {
+                let res = "";
+                for (let i = 0; i < 4; i++) {
+                    res += `.navigation ul li:nth-child(${
+                        i + 3
+                    }).active~.indicator{transform: translateX(calc(70px * ${
+                        i + 1
+                    }));}`;
+                }
+                let style = document.createElement("style");
+                style.innerHTML = res;
+                document.head.appendChild(style);
+            };
+            indicatorRules();
+        </script>
+    </body>
+</html> -->

@@ -117,14 +117,17 @@
             max-width: 600px;
             min-width: 330px;
         }
+
+        .abu1 {
+            background-color: #2c3034;
+        }
     </style>
 @endsection
 
 <div class="pb-5 mb-2">
-    <div class="d-flex justify-content-center atas py-4 align-items-center fixed-top">
-        <!-- Icon Kembali -->
-        <a href="javascript:void(0);" class="position-absolute start-0 p-3 text-white"
-            style="font-size: 24px; border-radius: 50%; background-color: transparent;" onclick="history.back();">
+    <div class="d-flex abu1 fixed-top py-3 align-items-center">
+        <a href="/" class="position-absolute start-0 p-3 text-white"
+            style="font-size: 24px; border-radius: 50%; background-color: transparent;">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
@@ -132,12 +135,10 @@
                 <path d="M15 6l-6 6l6 6" />
             </svg>
         </a>
-
-        <!-- Judul Teks -->
-        <h5 class="mb-0 text-white text-center fw-bolder w-100">Informasi Pemesanan</h5>
+        <p class="mb-0 text-white ms-5 mt-1 fs-6 fw-bolder w-100">Informasi Pemesanan</p>
     </div>
 
-    <section class="px-3 pt-5 mt-5">
+    <section class="px-3" style="margin-top:80px;">
         <div class="abu px-3 pb-4 mb-4 rounded border" style="border-color: #4343433a !important;">
             <h5 class="fs-7 text-white mb-0 fs-6 fw-bolder mt-4">Data Pemesan</h5>
             <hr class="px-2 text-secondary">

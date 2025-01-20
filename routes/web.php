@@ -34,7 +34,6 @@ Route::get('/sign_up', Signup::class)->name('signup');
 Route::get('/forgot-password', Forgotpassword::class)->name('forgot-password');
 Route::get('/reset-password/{token}/{email}', Resetpassword::class)->name('password.reset');
 
-
 Route::get('/barber', function () {
     return view('barber');
 });

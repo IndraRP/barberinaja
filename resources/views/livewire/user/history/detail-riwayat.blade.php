@@ -1,9 +1,17 @@
 @section('title', 'Detail Riwayat')
 
-<div class="detail_riwayat">
+@section('styles')
+    <style>
+        .abu1 {
+            background-color: #2c3034;
+        }
+    </style>
+@endsection
+
+<div class="detail_riwayat" style="margin-top: 60px;">
     <!-- Bagian header -->
-    <div class="d-flex justify-content-center abu fixed py-4 align-items-center position-relative">
-        <a href="/riwayat" class="position-absolute start-0 p-3 text-white"
+    <div class="d-flex abu1 fixed-top py-3 align-items-center">
+        <a href="/" class="position-absolute start-0 p-3 text-white"
             style="font-size: 24px; border-radius: 50%; background-color: transparent;">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -12,7 +20,7 @@
                 <path d="M15 6l-6 6l6 6" />
             </svg>
         </a>
-        <h5 class="mb-0 text-white text-center fw-bolder w-100">Informasi Pemesanan</h5>
+        <p class="mb-0 text-white ms-5 mt-1 fs-6 fw-bolder w-100">Informasi Pemesanan</p>
     </div>
 
     <!-- Alert jika ada -->
@@ -23,7 +31,7 @@
     @endif
 
     <!-- Detail Transaksi -->
-    <section class="px-3 pt-3 pb-5 mb-2">
+    <section class="px-3 pt-3 pb-3">
         <div class="abu px-3 pb-4 mb-3 rounded border">
             <h5 class="fs-7 text-white mb-0 fs-6 fw-bolder mt-4">Data Pemesan</h5>
             <hr class="px-2 text-secondary">
@@ -81,7 +89,7 @@
                 <div class="d-flex justify-content-center align-items-center mt-3">
                     <p class="text-white">Foto Barber Tidak Tersedia</p>
                 </div>
-            @endif  
+            @endif
         </div>
 
         <div class="abu px-3 py-4 mt-3 rounded border" style="border-color: #4343433a !important;">
@@ -111,19 +119,20 @@
                     <p class="fs-10 m-0 text-white fw-bolder">Metode Pembayaran</p>
                     <p class="fs-10 m-0 text-white">Transfer BRI</p>
                 </div>
-            </div>         
+            </div>
 
             <hr class="px-2 text-secondary">
             <div class="d-flex justify-content-between align-items-center p-1 emas">
                 <p class="fs-6 m-0 fw-bolder">Total Harga</p>
-                <p class="fs-6 m-0 fw-bolder">Rp{{ number_format($transaction->details->sum('total_harga'), 0, ',', '.') }}</p>
+                <p class="fs-6 m-0 fw-bolder">
+                    Rp{{ number_format($transaction->details->sum('total_harga'), 0, ',', '.') }}</p>
             </div>
 
         </div>
     </section>
 
-     <!-- Modal untuk Foto Besar -->
-     <div class="modal fade" id="buktiModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <!-- Modal untuk Foto Besar -->
+    <div class="modal fade" id="buktiModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark border-0">
                 <div class="modal-body p-3">

@@ -8,7 +8,7 @@ use Livewire\Component;
 class Riwayat extends Component
 {
     public $transactions;
-    public $filter = 'confirmed'; 
+    public $filter = 'pending'; 
 
     public function mount()
     {

@@ -1,7 +1,15 @@
 @section('title', 'Konfirmasi')
 
+@section('styles')
+    <style>
+        .abu1 {
+            background-color: #2c3034;
+        }
+    </style>
+@endsection
+
 <div>
-    <div class="d-flex justify-content-center abu fixed py-4 align-items-center position-relative">
+    <div class="d-flex abu1 fixed-top py-3 align-items-center">
         <a href="/" class="position-absolute start-0 p-3 text-white"
             style="font-size: 24px; border-radius: 50%; background-color: transparent;">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
@@ -11,7 +19,7 @@
                 <path d="M15 6l-6 6l6 6" />
             </svg>
         </a>
-        <h5 class="mb-0 text-white text-center fw-bolder w-100">Informasi Pemesanan</h5>
+        <p class="mb-0 text-white ms-5 mt-1 fs-6 fw-bolder w-100">Informasi Pemesanan</p>
     </div>
 
     @if (session()->has('success'))
@@ -26,7 +34,7 @@
         </div>
     @endif
 
-    <section class="px-3 pt-3 pb-3">
+    <section class="px-3 pb-3" style="margin-top:80px;">
         <!-- Data Pemesan -->
         <div class="abu px-3 pb-4 mb-3 rounded border" style="border-color: #4343433a !important;">
             <h5 class="fs-7 text-white mb-0 fs-6 fw-bolder mt-4">Data Pemesan</h5>
@@ -63,6 +71,16 @@
                     <p class="m-0" id="accountNumber">123456789123</p>
                 </div>
 
+                <div class="d-flex justify-content-between align-items-center p-1 fs-10 text-white">
+                    <p class="m-0">Nama Bank</p>
+                    <p class="m-0">Bank BRI</p>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center p-1 fs-10 text-white">
+                    <p class="m-0">Atas Nama</p>
+                    <p class="m-0">Indra Pratama</p>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center p-1 emas">
                     <p class="fs-6 m-0 fw-bolder">Total Harga</p>
                     <p class="fs-6 m-0 fw-bolder">
@@ -86,9 +104,19 @@
                     @endif
                 @enderror
             </div>
-
-            <button wire:click="confirmPayment" class="btn btn-warning text-white">Konfirmasi Pembayaran</button>
+        
+            <div class="d-flex">
+                <!-- Menambahkan wire:loading untuk menampilkan status loading di tombol -->
+                <button wire:click="confirmPayment" 
+                        class="btn btn-warning ms-auto text-white" 
+                        wire:loading.attr="disabled">
+                    <!-- Status loading di dalam tombol -->
+                    <span wire:loading.remove>Konfirmasi Pembayaran</span>
+                    <span wire:loading>Loading...</span>
+                </button>
+            </div>
         </div>
+        
     </section>
 </div>
 
@@ -120,29 +148,28 @@
     </script>
 
     <script>
-      function copyAccountNumber(text) {
-    var tempTextarea = document.createElement("textarea");
-    tempTextarea.style.position = "absolute";
-    tempTextarea.style.left = "-9999px"; 
-    tempTextarea.style.opacity = "0"; // Pastikan elemen tidak terlihat
-    tempTextarea.value = text; // Isi dengan teks yang akan disalin
-    document.body.appendChild(tempTextarea);
+        function copyAccountNumber(text) {
+            var tempTextarea = document.createElement("textarea");
+            tempTextarea.style.position = "absolute";
+            tempTextarea.style.left = "-9999px";
+            tempTextarea.style.opacity = "0"; // Pastikan elemen tidak terlihat
+            tempTextarea.value = text; // Isi dengan teks yang akan disalin
+            document.body.appendChild(tempTextarea);
 
-    // Pilih teks di dalam elemen <textarea>
-    tempTextarea.select();
-    tempTextarea.setSelectionRange(0, tempTextarea.value.length); // Pastikan teks terpilih sepenuhnya
+            // Pilih teks di dalam elemen <textarea>
+            tempTextarea.select();
+            tempTextarea.setSelectionRange(0, tempTextarea.value.length); // Pastikan teks terpilih sepenuhnya
 
-    // Salin teks ke clipboard
-    // try {
-    //     document.execCommand("copy");
-    //     alert("Code copied to clipboard: " + text); // Opsi: Tambahkan pesan alert atau visual feedback
-    // } catch (err) {
-    //     console.error("Gagal menyalin teks:", err);
-    // }
+            // Salin teks ke clipboard
+            // try {
+            //     document.execCommand("copy");
+            //     alert("Code copied to clipboard: " + text); // Opsi: Tambahkan pesan alert atau visual feedback
+            // } catch (err) {
+            //     console.error("Gagal menyalin teks:", err);
+            // }
 
-    // Hapus elemen sementara
-    document.body.removeChild(tempTextarea);
-}
-
+            // Hapus elemen sementara
+            document.body.removeChild(tempTextarea);
+        }
     </script>
 @endpush

@@ -11,12 +11,14 @@ class Bookingdetail2 extends Component
     public $service;
     public $services = [];
     public $serviceId;
-    public $currentPrice; // Properti untuk menyimpan harga layanan
+    public $currentPrice;
+    public $showConfirmationModal;
 
     // Method mount menerima parameter serviceId dari route
     public function mount($serviceId)
     {
         //dd(session()->all());
+        // Session::forget('selected_discount');
 
         $this->serviceId = $serviceId;
         $this->service = Service::findOrFail($this->serviceId);
@@ -42,11 +44,26 @@ class Bookingdetail2 extends Component
             'service_image' => $this->service->image,
         ];
 
-        
+
         Session::put('service_detail', $sessionData);
         return redirect()->route('form', ['id' => $this->service->id]);
-
     }
+
+    public function removeDiscountAndGoBack()
+    {
+        // Hapus session 'selected_discount'
+        Session::forget('selected_discount');
+        
+        // Redirect atau kembali ke halaman sebelumnya
+        return redirect()->route('previous.route'); // Ganti dengan rute yang sesuai
+    }
+
+    // Method untuk menutup modal konfirmasi
+    public function closeConfirmationModal()
+    {
+        $this->showConfirmationModal = false;
+    }
+
 
     // Method render untuk tampilan
     public function render()
