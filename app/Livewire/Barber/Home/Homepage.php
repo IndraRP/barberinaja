@@ -156,8 +156,8 @@ class Homepage extends Component
                 'text' => 'Anda berhasil mengerjakan ini.'
             ]);
 
-            // Redirect ke halaman history barber
-            $this->redirectRoute('history_barber');
+            $this->dispatch('close-modal');
+            return redirect("/home_barber");
         }
     }
 

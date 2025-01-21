@@ -32,16 +32,14 @@ class UserHomeIndex extends Component
     public $pendingTransactions = [];
     public $waitingConfirmationTransactions = [];
     public $banners = [];
-    public $times = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'];
 
+    public $times = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'];
     public $transaction;
     public $showModaltime = false;
-
     public $barber_id;
     public $tanggal;
     public $time;
     public $transactionId;
-
     public $takenTimes = [];
 
     public function mount()
@@ -58,10 +56,9 @@ class UserHomeIndex extends Component
             $this->trends = Tren::where('status', 'active')->get();
             $this->discounts = Discount::where('status', 'active')->with('service')->get();
 
-            // Ambil transaksi yang sesuai dengan pengguna yang sedang login
             $this->approvedTransactions = Transaction::where('customer_id', $this->user->id)
                 ->where('status', 'approved')
-                ->with('details.service')
+                ->with('details.service', 'barber')
                 ->get();
 
             $this->pendingTransactions = Transaction::where('customer_id', $this->user->id)
@@ -76,10 +73,10 @@ class UserHomeIndex extends Component
                 ->with('details.service')
                 ->get();
 
-            // Update transaksi yang statusnya 'pending' lebih dari 10 menit dan tidak ada bukti_image
             $this->updateCanceledTransactions();
-            // Format tanggal dan waktu transaksi
             $this->formatTransactionDates();
+            $this->checkApprovedTransaction();
+            $this->loadTakenTimes();
         } else {
             $this->name = 'Guest';
             $this->banners = ImageBanner::where('status', 'active')->get();
@@ -88,11 +85,7 @@ class UserHomeIndex extends Component
             $this->trends = Tren::where('status', 'active')->get();
             $this->discounts = Discount::where('status', 'active')->with('service')->get();
         }
-
-        $this->checkApprovedTransaction();
-        $this->loadTakenTimes();
     }
-
 
     public function updateCanceledTransactions()
     {
@@ -107,23 +100,24 @@ class UserHomeIndex extends Component
     public function formatTransactionDates()
     {
         $this->approvedTransactions = $this->approvedTransactions->map(function ($transaction) {
-            $transaction->formatted_date = Carbon::parse($transaction->time)->isoFormat('dddd, YYYY-MM-DD');
+            $transaction->formatted_date = Carbon::parse($transaction->appointment_date)->isoFormat('dddd, YYYY-MM-DD');
             $transaction->formatted_time = Carbon::parse($transaction->time)->format('H:i');
             return $transaction;
         });
 
         $this->pendingTransactions = $this->pendingTransactions->map(function ($transaction) {
-            $transaction->formatted_date = Carbon::parse($transaction->time)->isoFormat('dddd, YYYY-MM-DD');
+            $transaction->formatted_date = Carbon::parse($transaction->appointment_date)->isoFormat('dddd, YYYY-MM-DD');
             $transaction->formatted_time = Carbon::parse($transaction->time)->format('H:i');
             return $transaction;
         });
 
         $this->waitingConfirmationTransactions = $this->waitingConfirmationTransactions->map(function ($transaction) {
-            $transaction->formatted_date = Carbon::parse($transaction->time)->isoFormat('dddd, YYYY-MM-DD');
+            $transaction->formatted_date = Carbon::parse($transaction->appointment_date)->isoFormat('dddd, YYYY-MM-DD');
             $transaction->formatted_time = Carbon::parse($transaction->time)->format('H:i');
             return $transaction;
         });
     }
+
     public function selectDiscount($discountId)
     {
         $userId = auth()->id();
@@ -144,13 +138,14 @@ class UserHomeIndex extends Component
         $discount = Discount::find($discountId);
 
         if ($discount) {
-            // Simpan ke sesi
+            // Simpan ke sesi, termasuk service_id
             Session::put('selected_discount', [
                 'id' => $discount->id,
                 'name' => $discount->name,
                 'description' => $discount->description,
                 'image' => $discount->image,
                 'discount_percentage' => $discount->discount_percentage,
+                'service_id' => $discount->service_id, // Menyimpan service_id
             ]);
 
             // Simpan ke tabel user_discounts
@@ -167,43 +162,40 @@ class UserHomeIndex extends Component
 
     public function checkApprovedTransaction()
     {
-        // Ambil waktu sekarang
         $currentTime = Carbon::now();
-        // Tentukan rentang waktu, 3 menit sebelumnya dan 3 menit setelahnya
-        $startTime = $currentTime->copy()->subMinutes(10);  // 3 menit sebelumnya
-        $endTime = $currentTime->copy()->addMinutes(15);    // 3 menit setelahnya
+        $startTime = $currentTime->copy()->subMinutes(10);
+        $endTime = $currentTime->copy()->addMinutes(10);
 
-        // Mencari transaksi yang sesuai dengan kondisi
         $this->transaction = Transaction::where('status', 'approved')
-            ->whereDate('appointment_date', $currentTime->toDateString())  // Pastikan appointment_date sama dengan hari ini
-            ->whereBetween('time', [$startTime->format('H:i'), $endTime->format('H:i')])  // Pastikan 'time' berada dalam rentang waktu
-            ->first();  // Ambil transaksi pertama yang sesuai
+            ->whereDate('appointment_date', $currentTime->toDateString())
+            ->whereBetween('time', [$startTime->format('H:i'), $endTime->format('H:i')])
+            ->first();
 
+        // Jika transaksi ditemukan, buka modal
         if ($this->transaction) {
-            // Jika transaksi ditemukan, buka modal
             $this->showModaltime = true;
             $this->dispatch('open-modal');
         }
+
+        $transaction = Transaction::where('status', 'approved')
+            ->whereDate('appointment_date', '<=', $currentTime->format('Y-m-d'))
+            ->where('time', '>=', $endTime->format('H:i'))
+            ->first();
+
+        if ($transaction) {
+            // Jika transaksi ditemukan, jalankan fungsi checkAndUpdateStatus
+            $this->checkAndUpdateStatus($transaction);
+        }
     }
 
-    public function checkAndUpdateStatus()
+    public function checkAndUpdateStatus($transaction)
     {
-        // Ambil waktu sekarang
-        $now = Carbon::now();
-        // Simpan waktu batas 10 menit yang lalu
-        $thresholdTime = $now->subMinutes(10);
+        // dd($transaction);
+        if ($transaction) { // Pastikan transaksi ada
+            $transaction->status = 'canceled';  // Update status menjadi 'canceled'
+            $transaction->save();  // Simpan perubahan status ke database
 
-        // Ambil semua transaksi dengan status 'approved' yang appointment_date dan time lebih dari 10 menit lalu
-        $transactions = Transaction::whereRaw("STR_TO_DATE(CONCAT(appointment_date, ' ', time), '%Y-%m-%d %H:%i:%s') < ?", [$thresholdTime])
-            ->where('status', 'approved')
-            ->get();
-
-        foreach ($transactions as $transaction) {
-            // Update status transaksi menjadi 'canceled'
-            $transaction->status = 'canceled';
-            $transaction->save();
-
-            // Ambil barber schedule terkait dan ubah status menjadi 'done'
+            // Update status barber schedule jika ada
             $barberSchedule = BarberSchedule::where('transaction_id', $transaction->id)->first();
             if ($barberSchedule) {
                 $barberSchedule->status = 'done';
@@ -211,7 +203,6 @@ class UserHomeIndex extends Component
             }
         }
     }
-
 
     public function markAsArrived()
     {
@@ -231,13 +222,10 @@ class UserHomeIndex extends Component
         return redirect("/");
     }
 
-
-
     public function setTime($selectedTime)
     {
         $this->time = $selectedTime;
     }
-
 
     public function notArrived($transactionId, $newTime)
     {
@@ -264,7 +252,6 @@ class UserHomeIndex extends Component
         $this->dispatch('close-modal');
         return redirect("/");
     }
-
 
     public function cancelTransaction()
     {

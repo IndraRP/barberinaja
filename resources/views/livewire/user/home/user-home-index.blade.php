@@ -213,12 +213,12 @@
                                             @endforeach
                                         </p>
 
-                                        <p class="fs-7 m-0 mt-1">
+                                        <p class="fs-7 m-0">
+                                            <strong class="bi bi-person-check" style="font-size: 18px;"></strong>
                                             @foreach ($transaction->details as $detail)
-                                                {{ $detail->service->name ?? "Layanan Tidak Ditemukan" }}
+                                                <span class="ms-1">{{ $transaction->barber->name ?? "" }}</span>
                                             @endforeach
                                         </p>
-
                                     </div>
                                     <div class="ms-auto text-end">
                                         <p class="m-0">
@@ -250,6 +250,12 @@
                                         <p class="fs-7 m-0 mt-1">
                                             @foreach ($transaction->details as $detail)
                                                 {{ $detail->service->name ?? "Layanan Tidak Ditemukan" }}
+                                            @endforeach
+                                        </p>
+                                        <p class="fs-7 m-0">
+                                            <strong class="bi bi-person-check" style="font-size: 18px;"></strong>
+                                            @foreach ($transaction->details as $detail)
+                                                <span class="ms-1">{{ $transaction->barber->name ?? "" }}</span>
                                             @endforeach
                                         </p>
                                     </div>
@@ -410,6 +416,29 @@
                 <div class="modal-backdrop fade show"></div>
             </div>
 
+            <!-- Modal Not Arrived -->
+            <div x-show="showNotArrivedModal" x-cloak>
+                <div class="modal fade show d-block" id="NotArrivedModal" tabindex="-1" aria-labelledby="NotArrivedModal" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark">
+                            <div class="modal-header">
+                                <h5 class="modal-title emas" id="NotArrivedModal">Perhatian!!!</h5>
+                            </div>
+                            <div class="modal-body">
+                                <p class="fs-10 text-white">Anda bisa memilih untuk cancel transaksi atau mengatur ulang jadwal berdasarkan jadwal yang kosong/sisa hari ini!!!</p>
+                                <div class="d-flex">
+                                    <div class="ms-auto">
+                                        <button @click="showCancelModal = true" class="btn btn-outline-danger">Cancel Transaksi</button>
+                                        <button @click="showRecheduleModal = true" @click="showNotArrivedModal = false" class="btn btn-secondary ms-1">Atur Ulang</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop fade show"></div>
+            </div>
+
 
             <!-- Modal Cancel -->
             <div x-show="showCancelModal" x-cloak>
@@ -423,31 +452,8 @@
                                 <p class="fs-6 text-white">Jika anda mencancel transaksi ini maka kami tidak bisa mengembalikan uang anda!!!</p>
                                 <div class="d-flex">
                                     <div class="ms-auto">
-                                        <button wire:click="cancelTransaction()" class="btn btn-danger me-1">Cancel Transaksi</button>
+                                        <button wire:click="cancelTransaction()" class="btn btn-outline-danger me-1">Cancel Transaksi</button>
                                         <button @click="showCancelModal = false" class="btn btn-secondary">Tutup</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-backdrop fade show"></div>
-            </div>
-
-            <!-- Modal Not Arrived -->
-            <div x-show="showNotArrivedModal" x-cloak>
-                <div class="modal fade show d-block" id="NotArrivedModal" tabindex="-1" aria-labelledby="NotArrivedModal" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content bg-dark">
-                            <div class="modal-header">
-                                <h5 class="modal-title emas" id="NotArrivedModal">Perhatian!!!</h5>
-                            </div>
-                            <div class="modal-body">
-                                <p class="fs-10 text-white">Anda bisa memilih untuk cancel layanan atau mengatur ulang jadwal berdasarkan jadwal yang kosong/sisa hari ini!!!</p>
-                                <div class="d-flex">
-                                    <div class="ms-auto">
-                                        <button @click="showCancelModal = true" class="btn btn-danger">Cancel</button>
-                                        <button @click="showRecheduleModal = true" class="btn btn-secondary ms-1">Atur Ulang</button>
                                     </div>
                                 </div>
                             </div>
@@ -492,6 +498,7 @@
                                 <div class="d-flex">
                                     <div class="ms-auto">
                                         <!-- Tombol untuk update waktu -->
+                                        <button @click="showRecheduleModal = false" class="btn btn-outline-secondary mt-2">Tutup</button>
                                         <button wire:click="notArrived('{{ $transaction ? $transaction->id : "" }}', '{{ $this->time }}')" class="btn btn-success mt-2">Atur Ulang Jadwal</button>
                                     </div>
                                 </div>

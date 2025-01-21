@@ -42,58 +42,74 @@ class Metodepembayaran extends Component
             'barber' => null,
             'metode_pembayaran' => null,
         ]);
-    
+
         $this->selected_discount = Session::get('selected_discount', null);
-    
+
         $serviceDetail = Session::get('service_detail', null);
-        if ($serviceDetail) {
+        if ($serviceDetail && isset($serviceDetail['service_id'], $serviceDetail['service_price'])) {
             $this->serviceId = $serviceDetail['service_id'];
             $this->servicePrice = (float) $serviceDetail['service_price'];
             $this->service = Service::find($this->serviceId);
         } else {
             return redirect('/bookingdetail');
         }
-    
+
         if (empty($this->detail)) {
             return redirect('/bookingdetail');
         }
-    
+
         $this->metode_pembayaran = $this->detail['metode_pembayaran'] ?? null;
         $this->barber = $this->detail['barber_name'];
         $this->barber_id = $this->detail['barber'];
 
-    
+        // Cek jika ada diskon yang dipilih dan periksa kecocokan service_id
+        if ($this->selected_discount) {
+            // Cek apakah service_id diskon cocok dengan service_id layanan
+            if (isset($this->selected_discount['service_id']) && (int)$this->selected_discount['service_id'] !== (int)$this->serviceId) {
+                // Menandakan diskon tidak berlaku
+                $this->selected_discount['disabled'] = true;
+            } else {
+                // Diskon aktif jika ID cocok
+                $this->selected_discount['disabled'] = false;
+            }
+        }
+
         if (!auth()->check()) {
             return redirect('/login')->with('error', 'Anda harus login terlebih dahulu.');
         }
-    
+
         $biayaAdmin = 1000;
         $biayaAplikasi = 1000;
-    
+
         // Cek dan hitung total pembayaran
         $totalPembayaran = $this->servicePrice + $biayaAdmin + $biayaAplikasi;
-    
+
         // Jika ada diskon, kurangi harga dengan diskon
-        if ($this->selected_discount && $this->selected_discount['discount_percentage']) {
-            $discountAmount = $this->servicePrice * ($this->selected_discount['discount_percentage'] / 100);
+        if ($this->selected_discount && isset($this->selected_discount['discount_percentage']) && !$this->selected_discount['disabled']) {
+            $discountAmount = $this->servicePrice * ((float)$this->selected_discount['discount_percentage'] / 100);
             $totalPembayaran = ($this->servicePrice - $discountAmount) + $biayaAdmin + $biayaAplikasi;
         }
-    
+
         // Simpan total pembayaran ke session
         Session::put('total_pembayaran', $totalPembayaran);
 
-        //dd(session()->all());
-
         $this->nomer_rekening = '1234567890'; // Ganti dengan nilai yang sesuai
 
+        // // Debugging
+        // dd([
+        //     'service_id' => $this->serviceId,
+        //     'selected_discount_service_id' => $this->selected_discount['service_id'] ?? null,
+        //     'discount_disabled' => $this->selected_discount['disabled'] ?? null,
+        //     'total_pembayaran' => $totalPembayaran,
+        // ]);
     }
-    
-   public function showAlert()
-{
-    $this->alert('success', 'Berhasil!', [
-        'text' => 'No. Rekening berhasil disalin'
-    ]);
-}
+
+    public function showAlert()
+    {
+        $this->alert('success', 'Berhasil!', [
+            'text' => 'No. Rekening berhasil disalin'
+        ]);
+    }
 
     public function bayar()
     {
@@ -120,14 +136,15 @@ class Metodepembayaran extends Component
 
         // Simpan ID transaksi ke properti Livewire
         $this->transactionId = $transaction->id;
-    } 
+    }
 
-    public function hapus(){
-          // Hapus sesi setelah transaksi selesai
-          Session::forget('detail');
-          Session::forget('selected_discount');
-          Session::forget('service_detail');
-          Session::forget('total_pembayaran');
+    public function hapus()
+    {
+        // Hapus sesi setelah transaksi selesai
+        Session::forget('detail');
+        Session::forget('selected_discount');
+        Session::forget('service_detail');
+        Session::forget('total_pembayaran');
     }
 
     public function render()
