@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Validation\Rule;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Profil extends Component
 {
     use WithFileUploads;
+    use LivewireAlert;
 
     public $user;
     public $name;
@@ -24,6 +26,7 @@ class Profil extends Component
     public $imageUpload;
 
     protected $listeners = ['logout'];
+    public $isImageValid = false;
 
     public function mount()
     {
@@ -64,48 +67,56 @@ class Profil extends Component
         return redirect()->route('profile');
     }
 
+    public function updatedImageUpload()
+    {
+        $this->resetValidation();
+        $this->isImageValid = false;
 
+        try {
+            $this->validate([
+                'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:2024',
+            ]);
+
+            $this->isImageValid = true;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->addError('imageUpload', 'File yang diunggah lebih dari 2MB.');
+        }
+    }
 
     public function saveimage()
     {
         $validatedData = $this->validate([
-            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp,|max:2024', // Validasi format file
+            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:2024',
         ]);
 
         if ($this->imageUpload) {
-            // Hapus file gambar lama jika ada
             if ($this->user->image) {
                 Storage::disk('public')->delete($this->user->image);
             }
 
-            // Simpan file gambar baru
             $this->image = $this->imageUpload->store('images/profiles', 'public');
         }
 
-        // Perbarui data pengguna
         $this->user->update([
             'image' => $this->image,
         ]);
 
-        // Tambahkan flash message
-        session()->flash('message', 'Profil berhasil diperbarui!');
-        return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+        $this->alert('success', 'Perubahan berhasil dilakukan.');
+        return redirect()->route('profile');
     }
+
 
     public function updatePassword()
     {
-        // Validasi password
         $this->validate([
             'password' => 'required|current_password',
             'new_password' => 'required|string|min:8|same:confirm_password',
         ]);
 
-        // Perbarui password pengguna
         $this->user->update([
             'password' => Hash::make($this->new_password),
         ]);
 
-        // Tambahkan flash message
         session()->flash('message', 'Password berhasil diperbarui!');
         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
     }
@@ -113,7 +124,7 @@ class Profil extends Component
 
     public function logout()
     {
-        Auth::logout(); // Logout user
+        Auth::logout();
         return redirect('/');
     }
 

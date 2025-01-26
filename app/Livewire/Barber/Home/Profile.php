@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Validation\Rule;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Profile extends Component
 {
     use WithFileUploads;
+    use LivewireAlert;
 
     public $user;
     public $name;
@@ -20,7 +22,7 @@ class Profile extends Component
     public $password;
     public $new_password;
     public $confirm_password;
-    public $image; 
+    public $image;
     public $imageUpload;
 
     protected $listeners = ['logout'];
@@ -39,7 +41,7 @@ class Profile extends Component
         $this->image = $this->user->image;
     }
 
-    
+
     public function updateProfile()
     {
         $validatedData = $this->validate([
@@ -57,15 +59,14 @@ class Profile extends Component
             'phone_number' => $this->phone_number,
         ]);
 
-        // Tambahkan flash message
-        session()->flash('message', 'Profil berhasil diperbarui!');
         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
     }
 
 
 
-    public function saveimage(){
-           $validatedData = $this->validate([
+    public function saveimage()
+    {
+        $validatedData = $this->validate([
             'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp,|max:2024', // Validasi format file
         ]);
 
@@ -85,8 +86,11 @@ class Profile extends Component
         ]);
 
         // Tambahkan flash message
-        session()->flash('message', 'Profil berhasil diperbarui!');
-        return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+        $this->alert('success', 'Berhasil!', [
+            'text' => 'Foto Profile Berhasil di Perbarui.'
+        ]);
+
+        return redirect()->route('profile_barber');
     }
 
     public function updatePassword()
@@ -102,22 +106,25 @@ class Profile extends Component
             'password' => Hash::make($this->new_password),
         ]);
 
-         // Tambahkan flash message
-         session()->flash('message', 'Password berhasil diperbarui!');
-         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+        // Tambahkan flash message
+        $this->alert('success', 'Berhasil!', [
+            'text' => 'Profile Berhasil di Perbarui.'
+        ]);
+
+        return redirect()->route('profile_barber');
     }
 
-    
+
     public function logout()
     {
         Auth::logout(); // Logout user
-        return redirect('/home_barber');
+        return redirect('/');
     }
 
     public function render()
     {
         return view('livewire.barber.home.profile')
-        ->extends('layouts.barber')
-        ->section('content');
+            ->extends('layouts.barber')
+            ->section('content');
     }
 }

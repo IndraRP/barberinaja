@@ -108,33 +108,63 @@
 <div class="home mb-5 pb-4" id="content">
 
     <!-- Header -->
-    <div x-data="{ isVisible: true }">
-        <div class="navbar navbar-dark fixed-top d-flex justify-content-between align-items-center px-3" style="padding-top: 12px; padding-bottom: 12px; background-color: #333;">
-            <div class="d-flex flex-column">
-                <span class="fs-8 text-white">Selamat pagi, </span>
-                <h1 class="h6 fs-7 m-0 text-white">{{ $name }}</h1>
-            </div>
-            <div class="d-flex align-items-center">
-                <!-- Foto Profil -->
-                @if (!empty($image))
-                    <img src="{{ asset("storage/" . $image) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal untuk Foto Besar -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark border-0">
-                <div class="modal-body p-3">
-                    <!-- Gambar Besar di dalam Modal -->
-                    <img src="{{ asset("storage/" . ($image ?? "images/profiles/default1.jpg")) }}" class="img-fluid d-block mx-auto rounded" alt="Profile">
+    <div>
+        <!-- Header -->
+        <div x-data="{ isVisible: false }">
+            <div class="navbar navbar-dark fixed-top d-flex justify-content-between align-items-center px-3" style="padding-top: 12px; padding-bottom: 12px; background-color: #333;">
+                <div class="d-flex flex-column">
+                    <span class="fs-8 text-white">Selamat pagi, </span>
+                    <h1 class="h6 fs-7 m-0 text-white">{{ $name }}</h1>
+                </div>
+                <div class="d-flex align-items-center">
+                    <!-- Foto Profil -->
+                    @if (!empty($image))
+                        <img src="{{ asset("storage/" . $image) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" @click="isVisible = true">
+                    @endif
                 </div>
             </div>
-        </div>
-    </div>
 
+            <!-- Modal untuk Foto Besar -->
+            <div x-show="isVisible" class="modal fade show" style="display: block;" tabindex="-1" aria-labelledby="profileModalLabel" x-cloak @click.outside="isVisible = false" x-bind:inert="isVisible ? true : false">
+                <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;">
+                    <div class="modal-content bg-dark border-0">
+                        <div class="modal-body p-0" style="width: 330px; height: 330px; margin-top:10px">
+                            <!-- Gambar Besar di dalam Modal -->
+                            <img src="{{ asset("storage/" . ($image ?? "images/profiles/default1.jpg")) }}" class="img-fluid d-block mx-auto mt-2 rounded" alt="Profile" style="object-fit: cover; width: 90%; height: 92%; border-radius: 8px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backdrop -->
+            <div x-show="isVisible" class="modal-backdrop fade show" x-cloak></div>
+        </div>
+
+        <!-- CSS Tambahan -->
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+
+            .modal.fade.show {
+                display: block;
+                background: rgba(0, 0, 0, 0.5);
+            }
+
+            .modal-backdrop.fade.show {
+                opacity: 0.5;
+            }
+
+            /* Agar gambar terpotong dengan baik dalam modal */
+            .modal-body img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
+                border-radius: 8px;
+            }
+        </style>
+
+    </div>
 
     <!-- Banner Section -->
     <section class="splide mx-1 mt-2 pb-1" style="border-radius: 15px">
@@ -151,6 +181,13 @@
 
     <!-- Attention Section -->
     @if (Auth::check() && ($pendingTransactions->isNotEmpty() || $waitingConfirmationTransactions->isNotEmpty() || $approvedTransactions->isNotEmpty()))
+        @php
+            // Menghitung total transaksi dari semua kategori
+            $totalTransactions = $pendingTransactions->count() + $waitingConfirmationTransactions->count() + $approvedTransactions->count();
+            // Menentukan lebar elemen berdasarkan jumlah transaksi
+            $style = $totalTransactions === 1 ? "width: 318px; min-width: 318px;" : "width: 260px; min-width: 260px;";
+        @endphp
+
         <section class="mt-3 px-2">
             <div class="atas rounded p-2" style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%;">
                 <p class="fs-6 fw-bolder mb-0 text-white">Transaksi Anda</p>
@@ -159,10 +196,9 @@
                     <!-- Transaksi Pending -->
                     @foreach ($pendingTransactions as $transaction)
                         <a href="{{ url("/konfirmasi/" . $transaction->id) }}">
-                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; width: 260px; min-width: 260px;">
-                                <div class="d-flex align-items-center py-1">
-                                    <p class="fs-10 fw-bolder mb-0 mt-1 text-white">Jadwal Anda</p>
-                                    <div class="fs-11 border-danger text-danger ms-auto rounded border bg-transparent px-2 py-1">
+                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; {{ $style }}">
+                                <div class="d-flex justify-content-center align-items-center py-1">
+                                    <div class="fs-11 border-danger text-danger mt-1 rounded border bg-transparent px-2 py-1">
                                         Belum bayar
                                     </div>
                                 </div>
@@ -176,7 +212,7 @@
                                         <p class="fs-7 emas fw-bolder m-0">
                                             <span>Total Harga</span>
                                             @foreach ($transaction->details as $detail)
-                                                Rp {{ number_format($detail->total_harga) }}
+                                                Rp {{ number_format($detail->total_harga ?? 0, 0, ",", ".") }}
                                             @endforeach
                                         </p>
                                     </div>
@@ -198,10 +234,9 @@
                     <!-- Transaksi Waiting Confirmation -->
                     @foreach ($waitingConfirmationTransactions as $transaction)
                         <a href="{{ url("/detail_riwayat/" . $transaction->id) }}">
-                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; width: 260px; min-width: 260px;">
-                                <div class="d-flex align-items-center py-1">
-                                    <p class="fs-10 fw-bolder mb-0 mt-1 text-white">Jadwal Anda</p>
-                                    <div class="fs-11 border-warning text-warning ms-auto rounded border bg-transparent px-2 py-1">
+                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; {{ $style }}">
+                                <div class="d-flex justify-content-center align-items-center py-1">
+                                    <div class="fs-11 border-warning text-warning mt-1 rounded border bg-transparent px-2 py-1">
                                         Menunggu Konfirmasi
                                     </div>
                                 </div>
@@ -238,10 +273,9 @@
                     <!-- Transaksi Approved -->
                     @foreach ($approvedTransactions as $transaction)
                         <a href="{{ url("/detail_riwayat/" . $transaction->id) }}">
-                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; width: 260px; min-width: 260px;">
-                                <div class="d-flex align-items-center py-1">
-                                    <p class="fs-10 fw-bolder mb-0 mt-1 text-white">Jadwal Anda</p>
-                                    <div class="fs-11 border-success text-success ms-auto rounded border bg-transparent px-2 py-1">
+                            <li class="list-group-item abu border-warning my-1 me-2 rounded border px-2 text-white" style="flex: 0 0 auto; {{ $style }}">
+                                <div class="d-flex justify-content-center align-items-center py-1">
+                                    <div class="fs-11 mt-1 rounded px-2 py-1" style="border: 1px solid rgb(78, 255, 47); background-color: transparent; color:rgb(78, 255, 47);">
                                         Menunggu Hari
                                     </div>
                                 </div>
@@ -284,7 +318,6 @@
         </section>
     @endif
 
-
     <!-- Layanan Section -->
     <section class="px-2 pt-3">
         <div class="d-flex align-items-center">
@@ -300,7 +333,7 @@
                             <img src="{{ asset("storage/" . $service->image) }}" alt="{{ $service->name }}" class="d-block rounded" style="height: 140px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
                             <div class="position-absolute bg-dark fs-9 w-100 bottom-0 start-0 bg-opacity-50 p-1 text-center text-white">
                                 <p class="mb-0">{{ $service->name }}</p>
-                                <p class="emas mb-0">Rp {{ number_format($service->price) }}</p>
+                                <p class="emas mb-0">Rp {{ number_format($service->price ?? 0, 0, ",", ".") }}</p>
                             </div>
                         </a>
                     </div>
@@ -326,6 +359,7 @@
         </div>
     </section>
 
+    {{-- Diskon --}}
     <section class="mt-3 px-2">
         <div class="d-flex overflow-auto">
             @foreach ($discounts as $discount)
@@ -400,12 +434,12 @@
                                 {{-- <button type="button" class="btn-close" aria-label="Close" @click="showModal = false; Livewire.emit('close-modal')"></button> --}}
                             </div>
                             <div class="modal-body border-0">
-                                <p class="fs-7 text-white">Saat ini waktunya anda dilayani oleh Barber Kami.</p>
+                                <p class="fs-6 mb-1 text-white">Saat ini waktunya anda dilayani oleh Barber Kami.</p>
                                 <p class="fs-6 text-center text-white">Apakah anda sudah sampai di Barberinaja??</p>
                                 <div class="d-flex justify-content-center">
                                     <div>
                                         <button @click="showCancelModal = true" class="btn btn-outline-danger">Cancel Transaksi</button>
-                                        <button @click="showNotArrivedModal = true" class="btn btn-warning">Belum</button>
+                                        <button @click="showNotArrivedModal = true" class="btn border-danger border" style="background-color: #fff20088">Belum</button>
                                         <button wire:click="markAsArrived()" class="btn btn-success">Sudah</button>
                                     </div>
                                 </div>
@@ -429,7 +463,9 @@
                                 <div class="d-flex">
                                     <div class="ms-auto">
                                         <button @click="showCancelModal = true" class="btn btn-outline-danger">Cancel Transaksi</button>
-                                        <button @click="showRecheduleModal = true" @click="showNotArrivedModal = false" class="btn btn-secondary ms-1">Atur Ulang</button>
+                                        <button @click="showRecheduleModal = true; showNotArrivedModal = false" wire:click="loadTakenTimes({{ $transaction ? $transaction->id : "null" }}, {{ $barber_id }})" class="btn btn-secondary ms-1">
+                                            Atur Ulang
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -558,26 +594,6 @@
             });
 
             splide.mount();
-        });
-    </script>
-
-    <script>
-        // SweetAlert untuk tombol klaim
-        document.querySelectorAll('.klaim-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.closest('div').id;
-                const message = id === 'claim-1' ? 'Klaim Diskon 70% berhasil!' : 'Klaim khusus berhasil!';
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: message,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    background: '#1e1e2d',
-                    color: '#ffffff',
-                    iconColor: '#00c851',
-                    confirmButtonColor: '#ffb22d',
-                });
-            });
         });
     </script>
 @endpush

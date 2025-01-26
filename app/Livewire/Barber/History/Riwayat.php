@@ -15,24 +15,19 @@ class Riwayat extends Component
 
     public function mount()
     {
-        // Pastikan user sudah login
         if (!auth()->check()) {
             return redirect()->route('login');
         }
 
-        // Ambil data user yang sedang login
         $this->user = Auth::user();
 
-        // Load jadwal berdasarkan filter yang aktif
         $this->loadSchedules();
     }
 
     public function setFilter($status)
     {
-        // Set status filter yang dipilih
         $this->filter = $status;
 
-        // Reload jadwal sesuai filter
         $this->loadSchedules();
     }
 

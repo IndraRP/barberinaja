@@ -12,6 +12,7 @@ use App\Models\Tren;
 use App\Models\ImageBanner;
 use App\Models\UserDiscount;
 use Carbon\Carbon;
+use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -44,6 +45,7 @@ class UserHomeIndex extends Component
 
     public function mount()
     {
+
         if (auth()->check()) {
             $this->user = Auth::user();
             $this->name = $this->user->name;
@@ -76,7 +78,9 @@ class UserHomeIndex extends Component
             $this->updateCanceledTransactions();
             $this->formatTransactionDates();
             $this->checkApprovedTransaction();
-            $this->loadTakenTimes();
+            if ($this->transactionId) {
+                $this->loadTakenTimes($this->transactionId);
+            }
         } else {
             $this->name = 'Guest';
             $this->banners = ImageBanner::where('status', 'active')->get();
@@ -94,7 +98,10 @@ class UserHomeIndex extends Component
             ->where('status', 'pending')
             ->where('created_at', '<', $now->subMinutes(10)) // lebih dari 10 menit
             ->whereNull('bukti_image') // cek jika bukti_image kosong
-            ->update(['status' => 'canceled']); // update status menjadi 'canceled'
+            ->update([
+                'status' => 'canceled',
+                'canceled' => 'not_paid'
+            ]);
     }
 
     public function formatTransactionDates()
@@ -178,32 +185,49 @@ class UserHomeIndex extends Component
         }
 
         $transaction = Transaction::where('status', 'approved')
-            ->whereDate('appointment_date', '<=', $currentTime->format('Y-m-d'))
-            ->where('time', '>=', $endTime->format('H:i'))
+            ->whereDate('appointment_date', '<', $currentTime->toDateString())
             ->first();
 
         if ($transaction) {
-            // Jika transaksi ditemukan, jalankan fungsi checkAndUpdateStatus
             $this->checkAndUpdateStatus($transaction);
+        }
+
+        // Function menghapus
+        $transaction = Transaction::where('status', 'approved')
+            ->whereDate('appointment_date', '<=', $currentTime->toDateString())
+            ->whereTime('time', '<=', $currentTime->toTimeString())
+            ->first();
+
+
+        // Periksa jika transaksi ditemukan
+        if ($transaction) {
+            // Gabungkan appointment_date dan time untuk mendapatkan waktu transaksi
+            $transactionTime = Carbon::parse($transaction->appointment_date)->setTimeFromTimeString($transaction->time);
+            $transactionTimePlus10 = $transactionTime->addMinutes(10);
+
+            if ($currentTime->greaterThanOrEqualTo($transactionTimePlus10)) {
+                $this->checkAndUpdateStatus($transaction);
+            }
         }
     }
 
     public function checkAndUpdateStatus($transaction)
     {
         // dd($transaction);
-        if ($transaction) { // Pastikan transaksi ada
-            $transaction->status = 'canceled';  // Update status menjadi 'canceled'
-            $transaction->save();  // Simpan perubahan status ke database
+        // Logika untuk memperbarui status transaksi, misalnya mengubah status menjadi 'canceled'
+        $transaction->status = 'canceled';
+        $transaction->canceled = 'timeout';
+        $transaction->save();
 
-            // Update status barber schedule jika ada
-            $barberSchedule = BarberSchedule::where('transaction_id', $transaction->id)->first();
-            if ($barberSchedule) {
-                $barberSchedule->status = 'done';
-                $barberSchedule->save();
-            }
+        // Memperbarui status jadwal barber jika ada
+        $barberSchedule = BarberSchedule::where('transaction_id', $transaction->id)->first();
+        if ($barberSchedule) {
+            $barberSchedule->status = 'done';
+            $barberSchedule->save();
         }
     }
 
+    //Bisa
     public function markAsArrived()
     {
         if ($this->transaction) {
@@ -222,27 +246,25 @@ class UserHomeIndex extends Component
         return redirect("/");
     }
 
+    //Bisa
     public function setTime($selectedTime)
     {
         $this->time = $selectedTime;
     }
 
+    //Bisa
     public function notArrived($transactionId, $newTime)
     {
-        // Validasi input
-        if (!$transactionId || !$newTime) {
-            session()->flash('error', 'Transaction ID and new time are required.');
-            return;
-        }
 
-        //dd($transactionId, $newTime);
-
-        // Update waktu transaksi
-        $updated = Transaction::where('id', $transactionId)->update(['time' => $newTime]);
+        $updated = Transaction::where('id', $transactionId)
+            ->update([
+                'time' => $newTime,
+                'status' => 'approved',
+            ]);
 
         if ($updated) {
             $this->alert('success', 'Berhasil!', [
-                'text' => 'Oke, kedatangan anda tetap kami tunggu hingga 10 menit.'
+                'text' => 'Oke, kedatangan anda tetap kami tunggu.'
             ]);
         } else {
             $this->alert('error', 'Gagal', [
@@ -253,6 +275,7 @@ class UserHomeIndex extends Component
         return redirect("/");
     }
 
+    //Bisa
     public function cancelTransaction()
     {
         if ($this->transaction) {
@@ -277,10 +300,22 @@ class UserHomeIndex extends Component
         return redirect("/");
     }
 
-    public function loadTakenTimes()
+    //Bisa
+    public function loadTakenTimes($transactionId)
     {
-        // Mengambil semua transaksi yang sudah ada untuk barber dan tanggal yang dipilih
-        $this->takenTimes = Transaction::where('barber_id', $this->barber_id)
+        // Ambil transaksi berdasarkan transactionId
+        $transaction = Transaction::find($transactionId);
+
+        // Periksa apakah transaksi ditemukan
+        if (!$transaction) {
+            $this->alert('error', 'Gagal!', ['text' => 'Transaksi tidak ditemukan.']);
+            return;
+        }
+        $this->tanggal = $this->tanggal ?: Carbon::now()->format('Y-m-d');
+        $barber_id = $transaction->barber_id;
+
+        // Ambil waktu yang sudah diambil berdasarkan barber_id
+        $this->takenTimes = Transaction::where('barber_id', $barber_id)
             ->whereDate('appointment_date', $this->tanggal)
             ->whereIn('status', ['pending', 'approved'])
             ->pluck('time')
@@ -289,24 +324,19 @@ class UserHomeIndex extends Component
             })
             ->toArray();
 
-        // Menyaring waktu yang harus di-disable (sudah diambil atau waktu di masa lalu jika hari ini)
+        // dd($this->takenTimes);
+
         $this->takenTimes = collect($this->times)->filter(function ($time) {
-            // Tandai waktu sebagai terambil jika ada di takenTimes
             if (in_array($time, $this->takenTimes)) {
                 return true;
             }
 
-            // Jika tanggal yang dipilih adalah hari ini, tandai waktu sebelum sekarang sebagai terambil
             if (Carbon::parse($this->tanggal)->isToday()) {
                 return Carbon::parse($time)->format('H:i') < Carbon::now()->format('H:i');
             }
 
-            // Jika bukan hari ini, hanya tandai waktu yang sudah diambil
             return false;
         })->values()->toArray();
-
-        // Menampilkan daftar waktu yang sudah terambil
-        // dd($this->takenTimes);
     }
 
     public function render()

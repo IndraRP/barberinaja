@@ -1,6 +1,6 @@
-@section('title', 'Konfirmasi')
+@section("title", "Konfirmasi")
 
-@section('styles')
+@section("styles")
     <style>
         .abu1 {
             background-color: #2c3034;
@@ -9,36 +9,33 @@
 @endsection
 
 <div>
-    <div class="d-flex abu1 fixed-top py-3 align-items-center">
-        <a href="/" class="position-absolute start-0 p-3 text-white"
-            style="font-size: 24px; border-radius: 50%; background-color: transparent;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+    <div class="d-flex abu1 fixed-top align-items-center py-3">
+        <a href="/" class="position-absolute start-0 p-3 text-white" style="font-size: 24px; border-radius: 50%; background-color: transparent;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M15 6l-6 6l6 6" />
             </svg>
         </a>
-        <p class="mb-0 text-white ms-5 mt-1 fs-6 fw-bolder w-100">Informasi Pemesanan</p>
+        <p class="fs-6 fw-bolder w-100 mb-0 ms-5 mt-1 text-white">Informasi Pemesanan</p>
     </div>
 
-    @if (session()->has('success'))
+    @if (session()->has("success"))
         <div class="alert alert-success">
-            {{ session('success') }}
+            {{ session("success") }}
         </div>
     @endif
 
-    @if (session()->has('error'))
+    @if (session()->has("error"))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            {{ session("error") }}
         </div>
     @endif
 
     <section class="px-3 pb-3" style="margin-top:80px;">
         <!-- Data Pemesan -->
-        <div class="abu px-3 pb-4 mb-3 rounded border" style="border-color: #4343433a !important;">
-            <h5 class="fs-7 text-white mb-0 fs-6 fw-bolder mt-4">Data Pemesan</h5>
-            <hr class="px-2 text-secondary">
+        <div class="abu mb-3 rounded border px-3 pb-4" style="border-color: #4343433a !important;">
+            <h5 class="fs-7 fs-6 fw-bolder mb-0 mt-4 text-white">Data Pemesan</h5>
+            <hr class="text-secondary px-2">
             <div class="text-start">
                 <div class="d-flex justify-content-between align-items-center p-1">
                     <p class="fs-10 m-0 text-white">Nama Lengkap</p>
@@ -51,76 +48,80 @@
                 <div class="d-flex justify-content-between align-items-center p-1">
                     <p class="fs-10 m-0 text-white">Pesan untuk Tgl.</p>
                     <p class="fs-10 m-0 text-white">
-                        {{ \Carbon\Carbon::parse($transaction->appointment_date)->format('d/m/Y') }}</p>
+                        {{ \Carbon\Carbon::parse($transaction->appointment_date)->format("d/m/Y") }}</p>
                 </div>
                 <div class="d-flex justify-content-between align-items-center p-1">
                     <p class="fs-10 m-0 text-white">Jam Dipilih</p>
-                    <p class="fs-10 m-0 text-white"> {{ \Carbon\Carbon::parse($transaction->time)->format('H:i') }}</p>
+                    <p class="fs-10 m-0 text-white"> {{ \Carbon\Carbon::parse($transaction->time)->format("H:i") }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="abu px-3 pb-4 mb-3 rounded border" style="border-color: #4343433a !important;">
-            <h5 class="fs-7 text-white mb-0 fs-6 fw-bolder mt-4">Pembayaran</h5>
-            <hr class="px-2 text-secondary">
+        <div class="abu mb-3 rounded border px-3 pb-4" style="border-color: #4343433a !important;">
+            <h5 class="fs-7 fs-6 fw-bolder mb-0 mt-4 text-white">Pembayaran</h5>
+            <hr class="text-secondary px-2">
             <div class="text-start">
-                <div class="d-flex justify-content-between align-items-center p-1 fs-10 text-white"
-                    onclick="copyAccountNumber()" wire:click="showAlert">
+                <div class="d-flex justify-content-between align-items-center fs-10 p-1 text-white" onclick="copyAccountNumber()" wire:click="showAlert">
                     <p class="m-0">No Rekening</p>
-                    <div class="ms-5 col-2 text-end p-0 fs-6 m-0"><i class="bi bi-copy"></i></div>
+                    <div class="col-2 fs-6 m-0 ms-5 p-0 text-end"><i class="bi bi-copy"></i></div>
                     <p class="m-0" id="accountNumber">123456789123</p>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center p-1 fs-10 text-white">
+                <div class="d-flex justify-content-between align-items-center fs-10 p-1 text-white">
                     <p class="m-0">Nama Bank</p>
                     <p class="m-0">Bank BRI</p>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center p-1 fs-10 text-white">
+                <div class="d-flex justify-content-between align-items-center fs-10 p-1 text-white">
                     <p class="m-0">Atas Nama</p>
                     <p class="m-0">Indra Pratama</p>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center p-1 emas">
-                    <p class="fs-6 m-0 fw-bolder">Total Harga</p>
-                    <p class="fs-6 m-0 fw-bolder">
-                        Rp{{ number_format($transaction->details->sum('total_harga'), 0, ',', '.') }}</p>
+                <div class="d-flex justify-content-between align-items-center emas p-1">
+                    <p class="fs-6 fw-bolder m-0">Total Harga</p>
+                    <p class="fs-6 fw-bolder m-0">
+                        Rp{{ number_format($transaction->details->sum("total_harga"), 0, ",", ".") }}</p>
                 </div>
 
             </div>
         </div>
 
         <!-- Form Upload Bukti Pembayaran -->
-        <div class="abu px-3 pb-4 mb-4 rounded border" style="border-color: #4343433a !important;">
-            <h5 class="fs-6 text-white mb-0 fw-bolder fs-5 mt-4">Upload Bukti Pembayaran</h5>
-            <hr class="px-2 text-secondary">
+        <div class="abu mb-4 rounded border px-3 pb-4" style="border-color: #4343433a !important;">
+            <h5 class="fs-6 fw-bolder fs-5 mb-0 mt-4 text-white">Upload Bukti bhgu Pembayaran</h5>
+            <hr class="text-secondary px-2">
             <div>
-                <input type="file" wire:model="bukti_image" class="form-control mb-3">
-                @error('bukti_image')
-                    <span class="text-danger">{{ $message }}</span>
+                <input type="file" wire:model="bukti_image" class="form-control">
+
+                @error("bukti_image")
+                    <span class="text-danger fs-8">{{ $message }}</span>
                 @else
                     @if ($bukti_image)
-                        <span class="text-success">File telah dipilih: {{ $bukti_image->getClientOriginalName() }}</span>
+                        <span class="text-success fs-8">File telah dipilih: {{ $bukti_image->getClientOriginalName() }}</span>
                     @endif
                 @enderror
+
+                <!-- Loading indicator -->
+                <div wire:loading wire:target="bukti_image">
+                    <span class="text-info fs-8">Mengunggah file...</span>
+                </div>
             </div>
-        
-            <div class="d-flex">
+
+
+            <div class="d-flex justify-content-center fs-8">
                 <!-- Menambahkan wire:loading untuk menampilkan status loading di tombol -->
-                <button wire:click="confirmPayment" 
-                        class="btn btn-warning ms-auto text-white" 
-                        wire:loading.attr="disabled">
+                <button wire:click="confirmPayment" class="btn btn-warning fs-6 mt-3 text-white" wire:loading.attr="disabled">
                     <!-- Status loading di dalam tombol -->
                     <span wire:loading.remove>Konfirmasi Pembayaran</span>
                     <span wire:loading>Loading...</span>
                 </button>
             </div>
         </div>
-        
+
     </section>
 </div>
 
-@push('scripts')
+@push("scripts")
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         console.log('Script loaded');

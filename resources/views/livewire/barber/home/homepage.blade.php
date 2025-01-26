@@ -23,11 +23,8 @@
     <!-- Modal untuk Foto Besar -->
     <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark border-0">
-                <div class="modal-body p-3">
-                    <!-- Gambar Besar di dalam Modal -->
-                    <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="img-fluid d-block mx-auto rounded" alt="Profile">
-                </div>
+            <div class="modal-body bg-dark rounded" style="width: 330px; height: 330px; object-fit: cover;">
+                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="img-fluid d-block mx-auto rounded" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
             </div>
         </div>
     </div>

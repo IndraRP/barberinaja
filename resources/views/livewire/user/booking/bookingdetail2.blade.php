@@ -1,6 +1,6 @@
-@section('title', 'Booking Detail')
+@section("title", "Booking Detail")
 
-@section('styles')
+@section("styles")
 
     <style>
         .kuning1 {
@@ -30,58 +30,52 @@
     </style>
 @endsection
 
-<div class="pb-5 mb-4">
+<div class="mb-4 pb-5">
     <section class="">
         <div class="pb-1">
             <div style="position: relative;">
                 <!-- Gambar utama -->
-                <img src="{{ isset($service->image) ? asset('storage/' . $service->image) : 'https://via.placeholder.com/300x200' }}"
-                    alt="{{ $service->name ?? 'Layanan' }}" class="d-block"
-                    style="height: 300px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
+                <img src="{{ isset($service->image) ? asset("storage/" . $service->image) : "https://via.placeholder.com/300x200" }}" alt="{{ $service->name ?? "Layanan" }}" class="d-block" style="height: 300px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
             </div>
 
             <div class="p-3">
                 <div class="d-block align-items-center" id="main-container">
                     <div class="d-flex flex-column m-0" id="text-container">
-                        <h1 class="text-white fs-5 m-0">{{ $service->name ?? 'Potong Rambut' }}</h1>
+                        <h1 class="fs-5 m-0 text-white">{{ $service->name ?? "Potong Rambut" }}</h1>
                     </div>
                     <div class="d-flex align-items-center mt-2" id="action-container">
-                        <h1 class="emas fs-5 m-0">Rp {{ number_format($currentPrice ?? 0, 0, ',', '.') }}</h1>
+                        <h1 class="emas fs-5 m-0">Rp {{ number_format($currentPrice ?? 0, 0, ",", ".") }}</h1>
                     </div>
                 </div>
             </div>
 
             <div class="px-3">
-                <p class="fs-7 text-white m-0">{{ $service->description ?? 'Deskripsi layanan belum tersedia.' }}</p>
+                <p class="fs-7 m-0 text-white">{{ $service->description ?? "Deskripsi layanan belum tersedia." }}</p>
             </div>
 
             <!-- Service Section -->
-            <div class="d-flex align-items-center mt-3 mx-3">
-                <h2 class="text-white fs-6 mb-0">Layanan Lainnya</h2>
-                <a href="/booking" class="text-info ms-auto m-0 fs-7 text-decoration-none">Lihat Semua</a>
+            <div class="d-flex align-items-center mx-3 mt-3">
+                <h2 class="fs-6 mb-0 text-white">Layanan Lainnya</h2>
+                <a href="/booking" class="text-info fs-7 text-decoration-none m-0 ms-auto">Lihat Semua</a>
             </div>
         </div>
 
         <!-- Layanan lainnya -->
-        <section class="px-3 pt-2 mb-2">
+        <section class="mb-2 px-3 pt-2">
             <div class="pb-0" style="white-space: nowrap; position: relative; overflow-x: auto">
                 <div style="display: inline-flex; min-width: 100%; width: fit-content;">
                     @foreach ($services as $service)
                         {{-- Memeriksa apakah ID layanan tidak sama dengan ID yang ada di route URL saat ini --}}
                         @if ($service->id != request()->segment(2))
                             {{-- Gunakan segment(2) jika ID ada di posisi kedua URL --}}
-                            <div
-                                style="flex-shrink: 0; width: 170px; {{ $loop->last ? '' : 'margin-right: 10px;' }} position: relative;">
+                            <div style="flex-shrink: 0; width: 170px; {{ $loop->last ? "" : "margin-right: 10px;" }} position: relative;">
                                 <!-- Link ke halaman detail -->
                                 <a href="/bookingdetail/{{ $service->id }}" style="display: block;">
-                                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}"
-                                        class="rounded d-block"
-                                        style="height: 150px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
+                                    <img src="{{ asset("storage/" . $service->image) }}" alt="{{ $service->name }}" class="d-block rounded" style="height: 150px; width: 100%; border: none; box-shadow: none; object-fit: cover;">
 
-                                    <div
-                                        class="position-absolute bottom-0 start-0 text-white bg-dark bg-opacity-50 fs-9 w-100 text-center p-1">
+                                    <div class="position-absolute bg-dark fs-9 w-100 bottom-0 start-0 bg-opacity-50 p-1 text-center text-white">
                                         <p class="mb-0">{{ $service->name }}</p>
-                                        <p class="mb-0 emas">Rp {{ number_format($service->price, 0, ',', '.') }}</p>
+                                        <p class="emas mb-0">Rp {{ number_format($service->price, 0, ",", ".") }}</p>
                                     </div>
                                 </a>
                             </div>
@@ -91,14 +85,13 @@
             </div>
         </section>
 
-        <div class="p-2 bawah fixed-bottom">
+        <div class="bawah fixed-bottom p-2">
             <div class="d-flex justify-content-between align-items-center px-1" id="main-container">
                 <div class="d-flex flex-column m-0" id="text-container">
-                    <h1 class="fs-5 emas m-0">Rp {{ number_format($currentPrice ?? 0, 0, ',', '.') }}</h1>
+                    <h1 class="fs-5 emas m-0">Rp {{ number_format($currentPrice ?? 0, 0, ",", ".") }}</h1>
                 </div>
                 <div class="d-flex align-items-center" id="action-container">
-                    <button type="button" class="btn kuning text-white fs-6 fw-bold py-2 px-3"
-                        wire:click="saveServiceToSession({{ $service->id }})">
+                    <button type="button" class="btn kuning fs-6 fw-bold px-3 py-2 text-white" wire:click="saveServiceToSession({{ $service->id }})">
                         Pesan Sekarang
                     </button>
                 </div>
@@ -109,27 +102,33 @@
 
 
     <!-- Header dengan Tombol Kembali -->
-    <div id="header" class="position-fixed w-100 top-0 start-0 bg-transparent transition-all">
+    <div id="header" class="position-fixed w-100 start-0 top-0 bg-transparent transition-all">
         <div class="d-flex justify-content-between align-items-center p-1">
             <!-- Tombol Kembali -->
             <div class="d-flex align-items-center">
-                <a href="/booking" id="backButton" class="text-white abu rounded-circle p-2 my-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+                <a href="javascript:void(0)" onclick="handleBack()" class="abu rounded-circle my-1 p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M15 6l-6 6l6 6" />
                     </svg>
                 </a>
                 <!-- Text Detail Layanan -->
-                <p id="detailText" class="text-white fs-6 mt-3 fw-bolder ms-2 d-none">Detail Layanan</p>
+                <p id="detailText" class="fs-6 fw-bolder d-none ms-2 mt-3 text-white">Detail Layanan</p>
             </div>
         </div>
     </div>
-
+    <script>
+        function handleBack() {
+            if (document.referrer) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+    </script>
 </div>
 
-@push('scripts')
+@push("scripts")
     <script>
         window.addEventListener('scroll', function() {
             const header = document.getElementById('header');

@@ -11,11 +11,10 @@
         }
 
         /* Untuk perangkat desktop, menggunakan bg-dark */
-        @media (min-width: 768px) {
-            #bg-container {
-                background-color: #22232400;
-                /* bg-dark */
-            }
+        #bg-container {
+            background-color: #22232400;
+            /* bg-dark */
+        }
         }
     </style>
 

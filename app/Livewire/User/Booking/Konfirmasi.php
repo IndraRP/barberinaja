@@ -18,14 +18,14 @@ class Konfirmasi extends Component
 
     protected $messages = [
         'bukti_image.required' => 'File bukti pembayaran wajib diupload.',
-        'bukti_image.image' => 'File harus berupa gambar.',
+        'bukti_image.image' => 'File harus berupa gambar. Gunakan jpeg, png, jpg, gif, svg, atau webp. ',
         'bukti_image.mimes' => 'Format gambar tidak didukung. Gunakan jpeg, png, jpg, gif, svg, atau webp.',
-        'bukti_image.max' => 'Ukuran file maksimum adalah 2MB.',
+        'bukti_image.max' => 'Ukuran file maksimum adalah 5MB.',
     ];
 
 
     protected $rules = [
-        'bukti_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,JPG|max:2048', // Validasi file gambar
+        'bukti_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,JPG,HEIC|max:5120',
     ];
 
     public function mount($transactionId)
@@ -42,6 +42,18 @@ class Konfirmasi extends Component
         $this->alert('success', 'Berhasil!', [
             'text' => 'No. Rekening berhasil disalin'
         ]);
+    }
+
+    public function updatedBuktiImage()
+    {
+        try {
+            $this->validate([
+                'bukti_image' => 'image|max:2048', // Maksimal 2MB
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->reset('bukti_image'); // Reset input jika gagal validasi
+            throw $e;
+        }
     }
 
     public function confirmPayment()

@@ -22,7 +22,8 @@ class DashboardStatsWidget extends BaseWidget
         return [
             Card::make('Pendapatan Hari Ini', 'Rp ' . number_format(
                 DetailTransaction::whereHas('transaction', function ($query) {
-                    $query->whereDate('created_at', Carbon::today());
+                    $query->whereDate('created_at', Carbon::today())
+                        ->whereNotNull('bukti_image');
                 })->sum('total_harga'),
                 0,
                 ',',
@@ -43,9 +44,12 @@ class DashboardStatsWidget extends BaseWidget
                 ->description('Total pelanggan yang terdaftar')
                 ->icon('heroicon-o-users'),
 
-            Card::make('Transaksi Hari Ini', Transaction::whereDate('created_at', Carbon::today())->count())
+            Card::make('Transaksi Hari Ini', Transaction::whereDate('created_at', Carbon::today())
+                ->whereNotNull('bukti_image')  // Menambahkan kondisi untuk memastikan bukti_image ada
+                ->count())
                 ->description('Jumlah transaksi yang terjadi hari ini')
                 ->icon('heroicon-o-banknotes'),
+
 
             Card::make('Jumlah Barber', Barber::count())
                 ->description('Total barber yang tersedia')

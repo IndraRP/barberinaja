@@ -38,12 +38,11 @@ class Homepage extends Component
         $this->name = $this->user->name;
         $this->image = $this->user->image;
         $this->services = Service::all();
-        $this->transactions = Transaction::all();
+        $this->transactions = Transaction::where('barber_id', $this->user->id)->get(); // Ambil transaksi hanya yang sesuai dengan barber_id
 
-        // Ambil jadwal dengan status 'pending' untuk barber yang sedang login
         $this->pendingSchedules = BarberSchedule::where('barber_id', $this->user->id)
             ->where('status', 'pending')
-            ->with(['transaction.details.service']) // Memuat relasi transaksi dan detail layanan
+            ->with(['transaction.details.service'])
             ->get()
             ->map(function ($schedule) {
                 // Format kolom day sebagai tanggal
@@ -61,15 +60,13 @@ class Homepage extends Component
                 return $schedule;
             });
 
-        // Ambil jadwal dengan status 'arrived' untuk barber yang sedang login
         $this->arrivedSchedules = BarberSchedule::where('barber_id', $this->user->id)
             ->whereHas('transaction', function ($query) {
                 $query->where('status', 'arrived');
             })
-            ->with(['transaction.details.service', 'transaction.customer']) // Memuat relasi transaksi dan detail layanan
+            ->with(['transaction.details.service', 'transaction.customer'])
             ->get()
             ->map(function ($schedule) {
-                // Format kolom day sebagai tanggal
                 $schedule->formatted_date = $schedule->day
                     ? \Carbon\Carbon::parse($schedule->day)->format('d F Y')
                     : 'Tanggal Tidak Tersedia';
@@ -84,28 +81,22 @@ class Homepage extends Component
                 return $schedule;
             });
 
-        // Pilih jadwal pertama yang ditemukan (jika ada) untuk langsung dipilih
         if ($this->arrivedSchedules->isNotEmpty()) {
             $this->selectedSchedule = $this->arrivedSchedules->first();
 
-            // Periksa apakah jadwal ini masih dalam periode penundaan
             if ($this->selectedSchedule->delayed_until) {
                 $delayedUntil = \Carbon\Carbon::parse($this->selectedSchedule->delayed_until);
                 if ($delayedUntil->isFuture()) {
-                    // Jangan tampilkan modal jika masih dalam waktu penundaan
                     $this->showModal = false;
                 } else {
-                    // Tampilkan modal jika penundaan sudah selesai
                     $this->showModal = true;
                     $this->alert('info', 'Waktu penundaan telah selesai, Anda dapat memulai pengerjaan.');
                 }
             } else {
-                // Jika tidak ada penundaan, langsung tampilkan modal
                 $this->showModal = true;
             }
         }
     }
-
 
     public function closeModal()
     {
@@ -137,8 +128,6 @@ class Homepage extends Component
         }
     }
 
-
-
     public function startNow()
     {
         if ($this->selectedSchedule) {
@@ -160,7 +149,6 @@ class Homepage extends Component
             return redirect("/home_barber");
         }
     }
-
 
     public function startLater()
     {

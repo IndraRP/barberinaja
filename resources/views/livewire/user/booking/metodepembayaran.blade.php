@@ -175,7 +175,7 @@
             <div class="d-flex align-items-center mt-2">
                 <img src="{{ session()->get("service_detail") ? asset("storage/" . session()->get("service_detail")["service_image"]) : null }}" alt="{{ $service->service_name }}" class="d-block rounded" style="height: 70px; width: 70px; border: none; box-shadow: none; object-fit: cover;">
 
-                <div class="align-items-center px-3">
+                <div class="align-items-center ms-auto px-3 text-end">
                     <p class="fs-10 mb-0 text-white">{{ $service->name ?? "Nama Layanan" }}</p>
                     <p class="fs-10 emas">Rp {{ number_format($service->price ?? 0, 0, ",", ".") }}</p>
                 </div>
@@ -185,7 +185,7 @@
             <div class="d-flex mt-4">
                 <img src="{{ session()->get("detail") ? asset("storage/" . session()->get("detail")["barber_image"]) : null }}" alt="{{ $barber }}" class="rounded-circle" style="height: 55px; width: 55px; cursor: pointer; object-fit: cover;">
 
-                <div class="align-items-center px-3">
+                <div class="align-items-center ms-auto px-3 text-end">
                     <p class="fs-10 mb-0 pt-1 text-white">Barber yang Dipilih</p>
                     <p class="fs-10 emas">{{ $barber }}</p>
                 </div>
@@ -240,7 +240,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="fs-10 text-danger abu p-2">Anda Tidak mendapat Discount</div>
+                    {{-- <div class="fs-10 text-danger abu p-2">Anda Tidak mendapat Discount</div> --}}
                 @endif
 
 
@@ -302,7 +302,7 @@
                     </div>
                     <div class="row">
                         <div class="col-6 fs-7">Jam Dilayani</div>
-                        <div class="col-6 fs-7 text-end">{{ $detail["time"] ?? "-" }}</div>
+                        <div class="col-6 fs-7 text-end">{{ $detail["time"] ?? "-" }} WIB</div>
                     </div>
                     <p class="fs-7 fw-bolder mb-1 mt-3">Detail Layanan</p>
                     <div class="row">

@@ -1,6 +1,6 @@
-@section('title', 'Riwayat')
+@section("title", "Riwayat")
 
-@section('styles')
+@section("styles")
     <style>
         .custom-nav-item {
             flex: auto;
@@ -29,108 +29,227 @@
         .custom-nav-tabs {
             border-bottom: none;
         }
+
+        .custom-nav-tabs {
+            -ms-overflow-style: none;
+            /* Untuk Internet Explorer dan Edge */
+            scrollbar-width: none;
+            /* Untuk Firefox */
+        }
+
+        .custom-nav-tabs::-webkit-scrollbar {
+            display: none;
+            /* Untuk Chrome, Safari, dan Edge */
+        }
     </style>
 @endsection
 
 <div class="riwayat" wire:poll.60s="filterTransactions">
-    <div class="d-flex justify-content-center abu fixed py-4 align-items-center position-relative">
-        <a href="/" class="position-absolute start-0 p-3 text-white"
-            style="font-size: 24px; border-radius: 50%; background-color: transparent;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+    <div class="d-flex atas align-items-center fixed-top pb-4" style="padding-top: 16px">
+        <a href="/" class="position-absolute start-0 p-3 text-white" style="font-size: 24px; border-radius: 50%; background-color: transparent;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M15 6l-6 6l6 6" />
             </svg>
         </a>
 
-        <h5 class="mb-0 text-white text-center w-100">Pesanan Saya</h5>
+        <h6 class="w-100 fw-bolder mb-0 mt-1 text-white" style="margin-left: 60px;">Pesanan Saya</h6>
+        <i class="bi bi-funnel-fill fs-6 me-3 mt-2 text-white" data-bs-toggle="modal" data-bs-target="#filterModal"></i>
     </div>
 
-    <section>
-    <ul class="custom-nav-tabs justify-content-center d-flex mt-3 pe-2" role="tablist" style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%; padding-left:110px; ">
-        @foreach ($statuses as $key => $label)
-            <li class="custom-nav-item" role="presentation">
-                <a class="custom-nav-link {{ $filter === $key ? 'active' : '' }}"
-                    wire:click="setFilter('{{ $key }}')" role="tab">
-                    {{ $label }}
-                </a>
-            </li>
-        @endforeach
-    </ul>
-</section>
+    <section class="bg-dark fixed-top pb-1 pt-2" style="margin-top: 70px;">
+        <ul class="custom-nav-tabs justify-content-center d-flex mb-2 pe-3" role="tablist" style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%; padding-left:190px;">
+            @foreach ($statuses ?? [] as $key => $label)
+                <li class="custom-nav-item" role="presentation">
+                    <a class="custom-nav-link {{ $filter === $key ? "active" : "" }}" href="#{{ $key }}" role="tab" wire:click="setFilter('{{ $key }}')">
+                        {{ $label }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
 
-    <div class="mt-3 pb-4 mb-5">
-        @forelse ($transactions as $transaction)
-            <!-- Pengecekan apakah bukti_image kosong -->
-            <a
-                href="{{ empty($transaction->bukti_image) ? '/konfirmasi/' . $transaction->id : '/detail_riwayat/' . $transaction->id }}">
-                <div class="abu p-3 rounded border mb-3 mx-3" style="border-color: #4343433a !important;">
+        {{-- <div class="filter-tanggal mx-3 mb-1">
+            <div class="d-flex">
+                <div class="ms-1">
+                    <label for="startDate" class="emas fs-8">Mulai Tanggal</label>
+                    <input type="date" id="startDate" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="startDate" placeholder="Input Tanggal">
+                </div>
+                <div class="ms-1">
+                    <label for="endDate" class="emas fs-8">Sampai Tanggal</label>
+                    <input type="date" id="endDate" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="endDate" placeholder="Input Tanggal">
+                </div>
+                <div>
+                    <button class="btn kuning fw-bolder fs-8 ms-1 px-4 py-2 text-white" style="margin-top:24px;" wire:click="filterTransactions">Filter</button>
+                </div>
+            </div>
+        </div> --}}
+    </section>
+
+
+    <div class="" style="margin-top:120px; margin-bottom:100px;">
+        @forelse ($transactions ?? [] as $transaction)
+            <a href="{{ empty($transaction->bukti_image) && $transaction->status == "pending" ? "/konfirmasi/" . $transaction->id : "/detail_riwayat/" . $transaction->id }}">
+
+                <div class="abu mx-3 mb-3 rounded border p-3" style="border-color: #ffffff9c !important;">
                     <div class="d-flex align-items-center">
-                        <h1 class="fw-bold fs-6 mb-1 text-white">Layanan</h1>
-                        <button type="button"
-                        class="btn btn-outline-{{ $transaction->status === 'completed'
-                            ? 'success'
-                            : ($transaction->status === 'canceled'
-                                ? 'danger'
-                                : ($transaction->status === 'approved'
-                                    ? 'primary'
-                                    : ($transaction->status === 'pending' && !empty($transaction->bukti_image)
-                                        ? 'info'
-                                        : 'warning'))) }} ms-auto py-1 fs-9">
-                        {{ $transaction->status === 'pending'
-                            ? (!empty($transaction->bukti_image)
-                                ? 'Menunggu Konfirmasi'
-                                : 'Menunggu Pembayaran')
-                            : ($transaction->status === 'approved'
-                                ? 'Menunggu Hari'
-                                : ($transaction->status === 'completed'
-                                    ? 'Selesai'
-                                    : ($transaction->status === 'canceled'
-                                        ? 'Dibatalkan'
-                                        : ''))) }}
-                    </button>
-                    
+                        <p class="fs-8 fw-bolder mb-1 me-auto text-white">{{ $transaction->appointment_date->format("d/m/Y") }}</p>
+                        <div class="fw-bolder {{ $transaction->status === "completed" ? "btn-bright" : ($transaction->status === "canceled" ? "btn-bright-danger" : ($transaction->status === "approved" ? "btn-bright-primary" : ($transaction->status === "pending" && !empty($transaction->bukti_image) ? "btn-bright-info" : "btn-bright-warning"))) }} fs-9 ms-auto py-1">
+                            {{ $transaction->status === "pending" ? (!empty($transaction->bukti_image) ? "Menunggu Konfirmasi" : "Menunggu Pembayaran") : ($transaction->status === "approved" ? "Menunggu Hari" : ($transaction->status === "completed" ? "Selesai" : ($transaction->status === "canceled" ? "Dibatalkan" : ""))) }}
+                        </div>
+                        <style>
+                            .btn-bright {
+                                background-color: #69b86b;
+                                color: #000000;
+                                border: 2px solid #0a560d;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                text-align: center;
+                                display: inline-block;
+                            }
+
+                            .btn-bright-danger {
+                                background-color: #9a4e49;
+                                color: #ffffff;
+                                border: 2px solid #560a0a;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                text-align: center;
+                                display: inline-block;
+                            }
+
+                            .btn-bright-primary {
+                                background-color: #3f7098;
+                                color: #ffffff;
+                                border: 2px solid #0a0e56;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                text-align: center;
+                                display: inline-block;
+                            }
+
+                            .btn-bright-info {
+                                background-color: #438e98;
+                                color: #ffffff;
+                                border: 2px solid #0a2b56;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                text-align: center;
+                                display: inline-block;
+                            }
+
+                            .btn-bright-warning {
+                                background-color: #eaaf57;
+                                border: 2px solid #56210a;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                text-align: center;
+                                display: inline-block;
+                            }
+                        </style>
+
                     </div>
 
-                    <div>
-                        <p class="fs-9 mb-1 text-white ms-auto">{{ $transaction->appointment_date->format('d/m/Y') }}
-                        </p>
-                    </div>
+                    <hr class="style-two">
+                    <style>
+                        hr {
+                            margin: 10px 0;
+                            color: inherit;
+                            border: 0;
+                            border-top: var(--bs-border-width) solid;
+                            opacity: .25;
+                        }
+
+                        hr.style-two {
+                            border: 0;
+                            height: 1px;
+                            background-image: linear-gradient(to right, rgba(154, 154, 154, 0), rgba(255, 255, 255, 0.75), rgba(159, 159, 159, 0));
+                        }
+                    </style>
 
                     <div class="d-flex">
-                        <img src="{{ asset('storage/' . ($transaction->bukti_image ?? 'images/profiles/default1.jpg')) }}"
-                            alt="Service Image" class="mt-1 img-fluid rounded border border-white"
-                            style="height: 70px; width: 70px; object-fit: cover;">
+                        <img src="{{ asset("storage/" . ($transaction->bukti_image ?? "images/profiles/default1.jpg")) }}" alt="Service Image" class="img-fluid mt-1 rounded border border-white" style="height: 70px; width: 70px; object-fit: cover;">
 
-                        <div class="d- align-items-center pb-1 px-3 my-1">
+                        <div class="d- align-items-center my-1 px-3 pb-1">
                             <div class="">
                                 @foreach ($transaction->details as $detail)
                                     <p class="fw-bolder fs-7 mb-0 text-white">
-                                        {{ $detail->service->name ?? 'Layanan Tidak Ditemukan' }}
+                                        {{ $detail->service->name ?? "Layanan Tidak Ditemukan" }}
                                     </p>
                                 @endforeach
                                 <p class="fs-9 mb-0 text-white">Jam Pesan: {{ $transaction->time }}</p>
                                 <p class="fs-9 mb-0 text-white">Barberman:
-                                    {{ $transaction->barber->name ?? 'Tidak Diketahui' }}</p>
-                                <p class="fw-bolder fs-7 mb-0 emas">Rp
-                                    {{ number_format($transaction->details->sum('total_harga'), 0, ',', '.') }}</p>
+                                    {{ $transaction->barber->name ?? "Tidak Diketahui" }}</p>
+                                <p class="fw-bolder fs-7 emas mb-0">Rp
+                                    {{ number_format($transaction->details->sum("total_harga"), 0, ",", ".") }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </a>
         @empty
-            <div x-data="lottieAnimation()" class="text-center m-3 p-3 abu rounded">
+            <div x-data="lottieAnimation()" class="abu m-3 rounded p-3 text-center">
+                <div x-ref="lottie" class="lottie-animation" wire:ignore></div>
                 <p class="text-danger mt-3">Belum ada transaksi untuk status ini</p>
-                <div x-ref="lottie" class="lottie-animation"></div>
             </div>
         @endforelse
+
     </div>
+
+
+
+    <div wire:ignore.self class="modal fade align-items-center" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title emas" id="filterModalLabel">Filter</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="day" class="form-label emas">Filter Harian</label>
+                        <input type="date" id="day" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="day" placeholder="Filter Harian">
+
+                        <label for="month" class="form-label emas">Filter Bulanan</label>
+                        <select id="month" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="month">
+                            <option value="">Pilih Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+
+                        <label for="year" class="form-label emas">Filter Tahunan</label>
+                        <select id="year" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="year">
+                            <option value="">Pilih Tahun</option>
+                            @for ($i = date("Y"); $i >= 2024; $i--)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white">
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-@push('scripts')
+@push("scripts")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
     <script>
         function lottieAnimation() {
             return {
@@ -140,10 +259,26 @@
                         renderer: 'svg',
                         loop: true,
                         autoplay: true,
-                        path: '{{ asset('images/Animation2.json') }}'
+                        path: '{{ asset("images/Animation2.json") }}'
                     });
                 }
             }
         }
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Swipe handler
+            const swipeContainer = document.querySelector('.riwayat');
+            const hammer = new Hammer(swipeContainer);
+            hammer.on('swipeleft', () => {
+                @this.call('swipeFilter', 'next'); // Livewire method untuk filter berikutnya
+            });
+
+            hammer.on('swiperight', () => {
+                @this.call('swipeFilter', 'previous'); // Livewire method untuk filter sebelumnya
+            });
+        });
     </script>
 @endpush

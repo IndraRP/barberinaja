@@ -1,6 +1,6 @@
-@section('title', 'Home')
+@section("title", "Home")
 
-@section('styles')
+@section("styles")
     <style>
         .icon-size {
             font-size: 1.5rem;
@@ -147,36 +147,29 @@
 <div>
     <section>
         <div class="body">
-            @if (session('success'))
+            @if (session("success"))
                 <div class="alert alert-success">
-                    {{ session('success') }}
+                    {{ session("success") }}
                 </div>
             @endif
 
-            @if (session('error'))
+            @if (session("error"))
                 <div class="alert alert-danger">
-                    {{ session('error') }}
+                    {{ session("error") }}
                 </div>
             @endif
 
             <div class="profile-card">
                 <div class="profile-header"></div>
 
-                <img src="{{ asset('storage/' . ($image ?? 'images/profiles/default.jpg')) }}" alt="Profile Picture"
-                    class="profile-image"data-bs-toggle="modal" data-bs-target="#profileModal">
+                <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
 
                 <!-- Modal untuk Foto Besar -->
-                <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content bg-dark border-0">
-                            <div class="modal-body pt-2" style="width: 100%; height: 100%; object-fit: cover;">
-
-                                <!-- Gambar Besar di dalam Modal -->
-                                <img src="{{ asset('storage/' . ($image ?? 'images/profiles/default.jpg')) }}"
-                                    class="img-fluid rounded mx-auto d-block mt-2 border-0 " alt="Profile"
-                                    style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
+                <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered border-0">
+                        <div class="modal-body bg-dark rounded" style="width: 330px; height: 330px; object-fit: cover;">
+                            <!-- Gambar Besar di dalam Modal -->
+                            <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" class="img-fluid d-block mx-auto rounded border-0" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
                         </div>
                     </div>
                 </div>
@@ -190,35 +183,31 @@
                 <h2>{{ $name }}</h2>
                 <p>{{ $email }}</p>
 
-                <div class="nav_card py-4 warna mx-2 rounded">
-                    <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
-                        data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                <div class="nav_card warna mx-2 rounded py-4">
+                    <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                         <i class="fa-solid fa-square-pen emas fw-bold icon-size"></i>
-                        <h1 class="fs-7 text-white mx-3 pt-2">Edit Profile</h1>
-                        <i class="fa-solid fa-chevron-right ms-auto chevron-right"></i>
+                        <h1 class="fs-7 mx-3 pt-2 text-white">Edit Profile</h1>
+                        <i class="fa-solid fa-chevron-right chevron-right ms-auto"></i>
                     </div>
 
-                    <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
-                        data-bs-toggle="modal" data-bs-target="#editPasswordModal">
+                    <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
                         <i class="fa-solid fa-table-cells-row-unlock emas fw-bold icon-size2"></i>
-                        <h1 class="fs-7 text-white mx-3 pt-2">Ubah Password</h1>
-                        <i class="fa-solid fa-chevron-right ms-auto chevron-right "></i>
+                        <h1 class="fs-7 mx-3 pt-2 text-white">Ubah Password</h1>
+                        <i class="fa-solid fa-chevron-right chevron-right ms-auto"></i>
                     </div>
 
-                    <a href="mailto:indra@gmail.com?subject=Hubungi%20Kami&body=Halo,%20saya%20ingin%20menghubungi%20Anda"
-                        class="text-decoration-none">
-                        <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile">
+                    <a href="mailto:indra@gmail.com?subject=Hubungi%20Kami&body=Halo,%20saya%20ingin%20menghubungi%20Anda" class="text-decoration-none">
+                        <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2">
                             <i class="fa-solid fa-square-phone emas fw-bold icon-size"></i>
-                            <h1 class="fs-7 text-white mx-3 pt-2">Hubungi Kami</h1>
-                            <i class="fa-solid fa-chevron-right ms-auto chevron-right emas"></i>
+                            <h1 class="fs-7 mx-3 pt-2 text-white">Hubungi Kami</h1>
+                            <i class="fa-solid fa-chevron-right chevron-right emas ms-auto"></i>
                         </div>
                     </a>
 
-                    <div class="mt-1 py-2 px-3 rounded d-flex align-items-center mx-2 edit-profile"
-                        data-bs-toggle="modal" data-bs-target="#logoutModal">
+                    <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2" data-bs-toggle="modal" data-bs-target="#logoutModal">
                         <i class="bi bi-arrow-right-square-fill text-danger fw-bold icon-size2"></i>
                         <h1 class="fs-7 text-danger mx-3 pt-2">Logout</h1>
-                        <i class="fa-solid fa-chevron-right ms-auto chevron-right"></i>
+                        <i class="fa-solid fa-chevron-right chevron-right ms-auto"></i>
                     </div>
                 </div>
             </div>
@@ -226,8 +215,7 @@
     </section>
 
     <!-- Modal -->
-    <div wire:ignore.self class="modal fade align-items-center" id="editimageModal"
-        tabindex="-1"aria-labelledby="editimageModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade align-items-center" id="editimageModal" tabindex="-1" aria-labelledby="editimageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
@@ -238,51 +226,57 @@
                         <div class="mb-3">
                             <label for="photo" class="form-label emas">Unggah Foto</label>
                             <input type="file" class="form-control bg-modal" id="photo" wire:model="imageUpload">
-                            @if ($imageUpload)
+
+                            @error("imageUpload")
+                                <span class="text-danger fs-8">{{ $message }}</span>
+                            @enderror
+
+                            @if ($imageUpload && !$errors->has("imageUpload"))
                                 <div class="mt-2">
-                                    <p class="text-success">Gambar berhasil dipilih:
+                                    <p class="text-success fs-8">Gambar berhasil dipilih:
                                         <strong>{{ $imageUpload->getClientOriginalName() }}</strong>
                                     </p>
                                 </div>
                             @endif
+
+                            <!-- Loading indicator -->
+                            <div wire:loading wire:target="imageUpload">
+                                <span class="text-info fs-8">Mengunggah file...</span>
+                            </div>
                         </div>
                     </form>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="kuning text-white rounded py-1 px-3 border border-warning"
-                        wire:click="saveimage">
-                        Simpan
+                    <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white" wire:click="saveimage" wire:loading.attr="disabled">
+                        <span wire:loading.remove>Ubah Gambar</span>
+                        <span wire:loading>Loading...</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade align-items-center" id="editProfileModal" tabindex="-1"
-        aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade align-items-center" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
                     <h5 class="modal-title emas" id="editProfileModalLabel">Edit Profile</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form wire:submit.prevent="updateProfile">
                         <div class="mb-3">
                             <label for="name" class="form-label emas">Nama Lengkap</label>
-                            <input type="text" class="form-control bg-modal" id="name"
-                                placeholder="Ketik di sini" wire:model.defer="name">
+                            <input type="text" class="form-control bg-modal" id="name" placeholder="Ketik di sini" wire:model.defer="name">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label emas">Email</label>
-                            <input type="email" class="form-control bg-modal" id="email"
-                                placeholder="Ketik di sini" wire:model.defer="email">
+                            <input type="email" class="form-control bg-modal" id="email" placeholder="Ketik di sini" wire:model.defer="email">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="kuning text-white rounded py-1 px-3 border border-warning"
-                        wire:click="updateProfile">
+                    <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white" wire:click="updateProfile">
                         Simpan
                     </button>
                 </div>
@@ -290,8 +284,7 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade align-items-center" id="editPasswordModal" tabindex="-1"
-        aria-labelledby="editPasswordModalLabel" aria-hidden="false">
+    <div wire:ignore.self class="modal fade align-items-center" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
@@ -301,24 +294,20 @@
                     <form wire:submit.prevent="updatePassword">
                         <div class="mb-3">
                             <label for="password" class="form-label emas">Kata Sandi Lama</label>
-                            <input type="password" class="form-control bg-modal" id="password"
-                                placeholder="Ketik di sini" wire:model.defer="password">
+                            <input type="password" class="form-control bg-modal" id="password" placeholder="Ketik di sini" wire:model.defer="password">
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label emas">Kata Sandi Baru</label>
-                            <input type="password" class="form-control bg-modal" id="new_password"
-                                placeholder="Ketik di sini" wire:model.defer="new_password">
+                            <input type="password" class="form-control bg-modal" id="new_password" placeholder="Ketik di sini" wire:model.defer="new_password">
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label emas">Konfirmasi Kata Sandi Baru</label>
-                            <input type="password" class="form-control bg-modal" id="confirm_password"
-                                placeholder="Ketik di sini" wire:model.defer="confirm_password">
+                            <input type="password" class="form-control bg-modal" id="confirm_password" placeholder="Ketik di sini" wire:model.defer="confirm_password">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="kuning text-white rounded py-1 px-3 border border-warning"
-                        wire:click="updatePassword">Simpan</button>
+                    <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white" wire:click="updatePassword">Simpan</button>
                 </div>
             </div>
         </div>
@@ -329,8 +318,7 @@
             <div class="modal-content bg-dark border-0">
                 <div class="modal-header border-0">
                     <div class="d-flex justify-content-center w-100">
-                        <img src="https://cdn-icons-png.freepik.com/256/14442/14442285.png?ga=GA1.1.894313801.1732955252&semt=ais_hybrid"
-                            alt="Logout Icon" style="height: 150px; width:150px">
+                        <img src="https://cdn-icons-png.freepik.com/256/14442/14442285.png?ga=GA1.1.894313801.1732955252&semt=ais_hybrid" alt="Logout Icon" style="height: 150px; width:150px">
                     </div>
                 </div>
                 <div class="modal-body border-0 py-1">
