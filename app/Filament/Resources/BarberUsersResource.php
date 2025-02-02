@@ -51,7 +51,7 @@ class BarberUsersResource extends Resource
                 Forms\Components\Select::make('role')
                     ->label('Peran')
                     ->options([
-                        'customer' => 'Customer', // Hanya role customer yang bisa dipilih
+                        'barber' => 'Barber ', // Hanya role customer yang bisa dipilih
                     ])
                     ->default('customer')
                     ->required(),
@@ -100,9 +100,7 @@ class BarberUsersResource extends Resource
                     ->default('barber'), // Filter default untuk menampilkan hanya customer
             ])
 
-            ->actions([
-
-            ])
+            ->actions([])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

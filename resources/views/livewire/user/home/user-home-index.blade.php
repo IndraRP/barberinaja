@@ -109,7 +109,6 @@
 
     <!-- Header -->
     <div>
-        <!-- Header -->
         <div x-data="{ isVisible: false }">
             <div class="navbar navbar-dark fixed-top d-flex justify-content-between align-items-center px-3" style="padding-top: 12px; padding-bottom: 12px; background-color: #333;">
                 <div class="d-flex flex-column">
@@ -125,9 +124,9 @@
             </div>
 
             <!-- Modal untuk Foto Besar -->
-            <div x-show="isVisible" class="modal fade show" style="display: block;" tabindex="-1" aria-labelledby="profileModalLabel" x-cloak @click.outside="isVisible = false" x-bind:inert="isVisible ? true : false">
-                <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;">
-                    <div class="modal-content bg-dark border-0">
+            <div x-show="isVisible" class="modal fade show" style="display: block;" tabindex="-1" id="profilModal" aria-labelledby="profileModalLabel" x-cloak @click.outside="isVisible = false" x-bind:inert="isVisible ? true : false">
+                <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;" @click.stop>
+                    <div class="modal-content bg-dark border border-white">
                         <div class="modal-body p-0" style="width: 330px; height: 330px; margin-top:10px">
                             <!-- Gambar Besar di dalam Modal -->
                             <img src="{{ asset("storage/" . ($image ?? "images/profiles/default1.jpg")) }}" class="img-fluid d-block mx-auto mt-2 rounded" alt="Profile" style="object-fit: cover; width: 90%; height: 92%; border-radius: 8px;">
@@ -360,7 +359,7 @@
     </section>
 
     {{-- Diskon --}}
-    <section class="mt-3 px-2">
+    <section class="px-2">
         <div class="d-flex overflow-auto">
             @foreach ($discounts as $discount)
                 @php
@@ -371,17 +370,15 @@
 
                 @if (!$usedDiscount)
                     <!-- Slide Pertama -->
-                    <div class="kuning me-2 flex-shrink-0 rounded p-3" style="width: 265px;">
+                    <div class="kuning me-2 mt-3 flex-shrink-0 rounded p-3" style="width: 265px;">
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="text-black-50 fs-8 fw-bolder mb-1">{{ $discount->description }}</p>
                                 <h1 class="fw-bold fs-7 mb-2 text-white">{{ $discount->name }}</h1>
                                 <!-- Tombol Pilih Diskon -->
-                                <a href="{{ $discount->service ? "/bookingdetail/" . $discount->service->id : "/booking" }}">
-                                    <button wire:click="selectDiscount({{ $discount->id }})" class="btn btn-dark btn-sm fs-9 rounded-pill">
-                                        <span class="p-2">Pakai Sekarang</span>
-                                    </button>
-                                </a>
+                                <button id="openModalButton{{ $discount->id }}" class="btn btn-dark btn-sm fs-9 rounded-pill">
+                                    <span class="p-2">Pakai Sekarang</span>
+                                </button>
                             </div>
                             <!-- Gambar diposisikan di kanan -->
                             <img src="{{ asset("storage/" . $discount->image) }}" alt="{{ $discount->name }}" class="img-fluid ms-auto rounded" style="height: 55px; width: 55px;">
@@ -415,6 +412,31 @@
             @endforeach
         </div>
     </section>
+
+    {{-- MODALS DISKON --}}
+    @foreach ($discounts as $discount)
+        <div class="modal fade" id="myModal{{ $discount->id }}" tabindex="-1" aria-labelledby="diskonModalLabel{{ $discount->id }}" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered mx-3">
+                <div class="modal-content bg-dark text-white" wire:ignore>
+                    <div class="modal-header mt-3 border-0 p-0">
+                        <div class="d-flex justify-content-center w-100">
+                            <img src="https://cdn-icons-png.freepik.com/256/17110/17110281.png?ga=GA1.1.894313801.1732955252&semt=ais_hybrid" alt="Discount Icon" style="height: 150px; width:150px">
+                        </div>
+                    </div>
+                    <div class="modal-body px-3 py-0">
+                        <p class="fs-7 mb-0 mt-2 text-center">Diskon ini berlaku khusus Layanan <span class="fw-bolder">{{ $discount->service->name }}</span></p>
+                        <p class="text-center">Apakah Anda yakin ingin menggunakan diskon ini?</p>
+                    </div>
+                    <div class="modal-footer px-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <a href="{{ $discount->service ? "/bookingdetail/" . $discount->service->id : "/booking" }}">
+                            <button type="button" class="btn btn-warning" wire:click="selectDiscount({{ $discount->id }})">Ya, Gunakan</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     {{-- MODALS --}}
     <div>
@@ -575,12 +597,11 @@
 
 </div>
 
-
-
 @push("scripts")
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@3.6.12/dist/js/splide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var splide = new Splide('.splide', {
@@ -594,6 +615,27 @@
             });
 
             splide.mount();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @foreach ($discounts as $discount)
+                const openModalButton{{ $discount->id }} = document.getElementById('openModalButton{{ $discount->id }}');
+                const modalElement{{ $discount->id }} = document.getElementById('myModal{{ $discount->id }}');
+
+                const modalInstance{{ $discount->id }} = new bootstrap.Modal(modalElement{{ $discount->id }});
+
+                openModalButton{{ $discount->id }}.addEventListener('click', function() {
+                    modalInstance{{ $discount->id }}.show();
+                });
+            @endforeach
+        });
+    </script>
+
+    <script>
+        $("#profilModal").on('hide.bs.modal', function() {
+            return false;
         });
     </script>
 @endpush

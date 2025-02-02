@@ -7,6 +7,8 @@ use App\Models\Transaction;
 use App\Models\DetailTransaction;
 use App\Models\Service;
 use App\Models\Barber;
+use App\Models\Discount;
+use App\Models\UserDiscount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -34,6 +36,7 @@ class Metodepembayaran extends Component
 
     public function mount()
     {
+        //dd(session()->all());
         // Ambil data dari sesi
         $this->detail = Session::get('detail', [
             'name' => '',
@@ -43,7 +46,8 @@ class Metodepembayaran extends Component
             'metode_pembayaran' => null,
         ]);
 
-        $this->selected_discount = Session::get('selected_discount', null);
+        // $this->selected_discount = Session::get('selected_discount', []);
+        $this->selected_discount = Session::get('selected_discount', []);
 
         $serviceDetail = Session::get('service_detail', null);
         if ($serviceDetail && isset($serviceDetail['service_id'], $serviceDetail['service_price'])) {
@@ -59,8 +63,10 @@ class Metodepembayaran extends Component
         }
 
         $this->metode_pembayaran = $this->detail['metode_pembayaran'] ?? null;
-        $this->barber = $this->detail['barber_name'];
-        $this->barber_id = $this->detail['barber'];
+        $this->barber = $this->detail['barber_name'] ?? null;
+        $this->barber_id = $this->detail['barber'] ?? null;
+
+
 
         // Cek jika ada diskon yang dipilih dan periksa kecocokan service_id
         if ($this->selected_discount) {
@@ -111,32 +117,47 @@ class Metodepembayaran extends Component
         ]);
     }
 
-    public function bayar()
+    public function bayar($discountId = null)
     {
+        // Ambil total pembayaran dari session
         $totalPembayaran = Session::get('total_pembayaran', 0);
 
-        // Pastikan kita mengambil ID barber dan data lainnya dengan benar
+        // Buat transaksi
         $transaction = Transaction::create([
-            'customer_id' => auth()->user()->id,
-            'barber_id' => $this->barber_id,
-            'name_customer' => $this->detail['name'],
-            'phone_number' => $this->detail['phone_number'],
+            'customer_id'      => auth()->user()->id,
+            'barber_id'        => $this->barber_id,
+            'name_customer'    => $this->detail['name'],
+            'phone_number'     => $this->detail['phone_number'],
             'appointment_date' => $this->detail['tanggal'],
-            'time' => $this->detail['time'],
-            'status' => 'pending',  // Status transaksi bisa diubah nanti
+            'time'             => $this->detail['time'] ?? '00:00',
+            'status'           => 'pending',
         ]);
 
         // Simpan detail transaksi
         DetailTransaction::create([
             'transactions_id' => $transaction->id,
-            'service_id' => $this->serviceId,
-            'harga' => $this->servicePrice,
-            'total_harga' => $totalPembayaran, // Total yang sudah dihitung di session
+            'service_id'      => $this->serviceId,
+            'harga'           => $this->servicePrice,
+            'total_harga'     => $totalPembayaran,
         ]);
 
-        // Simpan ID transaksi ke properti Livewire
+        // Hanya simpan data diskon jika $discountId valid (tidak null dan bukan 0)
+        if (!empty($discountId) && $discountId != 0) {
+            $discount = Discount::find($discountId);
+            if (!$discount) {
+                $this->alert('error', 'Diskon tidak ditemukan!');
+                return;
+            }
+            UserDiscount::create([
+                'user_id'     => auth()->id(),
+                'discount_id' => $discountId,
+            ]);
+        }
+
         $this->transactionId = $transaction->id;
+        $this->alert('success', 'Transaksi berhasil!');
     }
+
 
     public function hapus()
     {

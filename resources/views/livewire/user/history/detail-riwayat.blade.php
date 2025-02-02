@@ -38,24 +38,6 @@
         </div>
     @endif
 
-    @if ($transaction->status == "canceled")
-        <div class="abu fs-10 d-flex border-danger text-danger mx-3 mb-1 rounded border p-2" style="margin-top: 75px;">
-            <p class="mb-0 me-auto">Dibatalkan Karena</p>
-
-            <div class="ms-auto">
-                @if ($transaction->canceled == "payment")
-                    <p class="mb-0">Ditolak oleh admin</p>
-                @elseif ($transaction->canceled == "timeout")
-                    <p class="mb-0">Melewati Waktu Dilayani</p>
-                @elseif ($transaction->canceled == "not_paid")
-                    <p class="mb-0">Belum Dibayar</p>
-                @else
-                @endif
-            </div>
-        </div>
-    @endif
-
-
     <!-- Detail Transaksi -->
     <section class="px-3 pb-3 pt-2">
 
@@ -67,21 +49,28 @@
                     <div class="fs-10 border-primary text-primary rounded border p-2">Menunggu Hari</div>
                 @elseif ($transaction->status == "completed" || $transaction->status == "arrived")
                     <div class="fs-10 border-success text-success rounded border p-2">Transaksi Selesai</div>
-                @elseif ($transaction->status == "cancel")
-                    <div class="fs-10 border-danger text-danger rounded border p-2">
-                        @if ($transaction->canceled == "payment")
-                            Ditolak oleh admin
-                        @elseif ($transaction->canceled == "timeout")
-                            Melewati Waktu Dilayani
-                        @elseif ($transaction->canceled == "not_paid")
-                            Belum Dibayar
-                        @endif
-                    </div>
+                @elseif ($transaction->status == "canceled" || $transaction->status == "canceled")
+                    <div class="fs-10 border-danger text-danger rounded border p-2">Dibatalkan</div>
                 @else
                 @endif
             </div>
         </div>
 
+
+        @if ($transaction->status == "canceled")
+            <div class="abu fs-10 d-flex border-danger rounded border p-2 text-white" style="margin-top: 16px; margin-bottom:16px;">
+                @if ($transaction->canceled == "payment")
+                    <p class="mb-0">Mohon maaf Transaksi ini dibatalkan oleh admin karena Pembayaran Tidak Sesuai</p>
+                @elseif ($transaction->canceled == "timeout")
+                    <p class="mb-0">Mohon maaf Transaksi ini dibatalkan oleh admin karena Anda Melewati Batas Jadwal</p>
+                @elseif ($transaction->canceled == "not_paid")
+                    <p class="mb-0">Mohon maaf Transaksi ini dibatalkan oleh admin karena Anda Melewati Batas Waktu Pembayaran</p>
+                @elseif ($transaction->canceled == "user_cancel")
+                    <p class="mb-0">Mohon maaf Transaksi ini saya batalkan karena Tidak Bisa Datang Sesuai Jadwal</p>
+                @else
+                @endif
+            </div>
+        @endif
 
         <div class="abu mb-3 rounded border px-3 pb-4">
             <h5 class="fs-7 fs-6 fw-bolder mb-0 mt-4 text-white">Data Pemesan</h5>
@@ -112,20 +101,25 @@
             <h5 class="fs-7 fs-6 fw-bolder mb-0 mt-4 text-white">Detail Layanan</h5>
             <hr class="text-secondary px-2">
             @foreach ($transaction->details as $detail)
-                <div class="d-flex justify-content-between align-items-center p-1">
-                    <img src="{{ asset("storage/" . ($detail->service->image ?? "default.jpg")) }}" alt="Foto Layanan" class="img-fluid rounded" style="height: 70px; width: 70px; object-fit: cover; border-radius: 50%;" />
-                    <div class="d-block text-end">
-                        <p class="fs-10 m-0 text-white">{{ $detail->service->name ?? "Layanan Tidak Ditemukan" }}</p>
-                        <p class="fs-10 emas m-0">Rp {{ number_format($detail->service->price, 0, ",", ".") }}</p>
+                <a href="/bookingdetail/{{ $detail->service->id }}">
+                    <div class="d-flex justify-content-between align-items-center p-1">
+                        <img src="{{ asset("storage/" . ($detail->service->image ?? "default.jpg")) }}" alt="Foto Layanan" class="img-fluid rounded" style="height: 70px; width: 70px; object-fit: cover; border-radius: 50%;" />
+                        <div class="d-block text-end">
+                            <p class="fs-10 m-0 text-white">{{ $detail->service->name ?? "Layanan Tidak Ditemukan" }}</p>
+                            <p class="fs-10 emas m-0">Rp {{ number_format($detail->service->price, 0, ",", ".") }}</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             @endforeach
 
 
             <hr class="text-secondary px-2">
             @if ($transaction->barber && $transaction->barber->image)
                 <div class="d-flex justify-content-center align-items-center mt-2">
-                    <img src="{{ asset("storage/" . $transaction->barber->image) }}" alt="Foto Barber" class="img-fluid rounded-circle me-auto" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;" />
+                    <a href="/barberdetail/{{ $transaction->barber->id }}">
+                        <img src="{{ asset("storage/" . $transaction->barber->image) }}" alt="Foto Barber" class="img-fluid rounded-circle me-auto" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;" />
+                    </a>
+
                     <div class="d-block ms-auto text-end">
                         <p class="fs-10 fw-bolder m-0 text-white">Barber yang Dipilih</p>
                         <p class="fs-10 emas m-0 ms-auto">{{ $transaction->barber->name ?? "Barber Tidak Ditemukan" }}
@@ -163,13 +157,21 @@
     <p class="fs-10 fw-bolder m-0 text-white">Bukti Pembayaran</p>
 
     <div class="d-flex justify-content-center align-items-center mt-2">
-        <img src="{{ asset("storage/" . $transaction->bukti_image ?? "https://via.placeholder.com/70") }}" alt="Service Image" class="img-fluid mt-1 rounded border border-white" style="height: 70px; width: 70px; object-fit: cover;"data-bs-toggle="modal" data-bs-target="#buktiModal">
+        <img src="{{ asset("storage/" . ($transaction->bukti_image ?? "images/profiles/default1.jpg")) }}" alt="Service Image" class="img-fluid mt-1 rounded border border-white" style="height: 70px; width: 70px; object-fit: cover;" data-bs-toggle="modal" data-bs-target="#buktiModal">
 
         <div class="d-block ms-auto text-end">
             <p class="fs-10 fw-bolder m-0 text-white">Metode Pembayaran</p>
             <p class="fs-10 m-0 text-white">Transfer BRI</p>
+            @if ($transaction->status == "approved")
+                <p class="fs-10 fw-bolder m-0" style="color:rgb(78, 255, 47);">Pembayaran Berhasil</p>
+            @else
+                <!-- Placeholder untuk menjaga alignment -->
+                <p class="fs-10 m-0" style="opacity: 0;">Placeholder</p>
+            @endif
         </div>
     </div>
+
+
 
     <hr class="text-secondary px-2">
     <div class="d-flex justify-content-between align-items-center emas p-1">

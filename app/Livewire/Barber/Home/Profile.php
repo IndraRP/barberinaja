@@ -26,6 +26,7 @@ class Profile extends Component
     public $imageUpload;
 
     protected $listeners = ['logout'];
+    public $isImageValid = false;
 
     public function mount()
     {
@@ -40,7 +41,6 @@ class Profile extends Component
         $this->phone_number = $this->user->phone_number;
         $this->image = $this->user->image;
     }
-
 
     public function updateProfile()
     {
@@ -62,35 +62,42 @@ class Profile extends Component
         return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
     }
 
+    public function updatedImageUpload()
+    {
+        $this->resetValidation();
+        $this->isImageValid = false;
 
+        try {
+            $this->validate([
+                'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:10240',
+            ]);
+
+            $this->isImageValid = true;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->addError('imageUpload', 'File yang diunggah lebih dari 2MB.');
+        }
+    }
 
     public function saveimage()
     {
         $validatedData = $this->validate([
-            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp,|max:2024', // Validasi format file
+            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:10240',
         ]);
 
         if ($this->imageUpload) {
-            // Hapus file gambar lama jika ada
             if ($this->user->image) {
                 Storage::disk('public')->delete($this->user->image);
             }
 
-            // Simpan file gambar baru
             $this->image = $this->imageUpload->store('images/profiles', 'public');
         }
 
-        // Perbarui data pengguna
         $this->user->update([
             'image' => $this->image,
         ]);
 
-        // Tambahkan flash message
-        $this->alert('success', 'Berhasil!', [
-            'text' => 'Foto Profile Berhasil di Perbarui.'
-        ]);
-
-        return redirect()->route('profile_barber');
+        $this->alert('success', 'Perubahan berhasil dilakukan.');
+        return redirect()->route('profile');
     }
 
     public function updatePassword()
@@ -113,7 +120,6 @@ class Profile extends Component
 
         return redirect()->route('profile_barber');
     }
-
 
     public function logout()
     {

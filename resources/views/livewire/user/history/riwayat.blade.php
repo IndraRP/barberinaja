@@ -57,6 +57,7 @@
         <i class="bi bi-funnel-fill fs-6 me-3 mt-2 text-white" data-bs-toggle="modal" data-bs-target="#filterModal"></i>
     </div>
 
+    {{-- Navbar --}}
     <section class="bg-dark fixed-top pb-1 pt-2" style="margin-top: 70px;">
         <ul class="custom-nav-tabs justify-content-center d-flex mb-2 pe-3" role="tablist" style="white-space: nowrap; position: relative; overflow-x: auto; width: 100%; max-width: 100%; padding-left:190px;">
             @foreach ($statuses ?? [] as $key => $label)
@@ -67,24 +68,7 @@
                 </li>
             @endforeach
         </ul>
-
-        {{-- <div class="filter-tanggal mx-3 mb-1">
-            <div class="d-flex">
-                <div class="ms-1">
-                    <label for="startDate" class="emas fs-8">Mulai Tanggal</label>
-                    <input type="date" id="startDate" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="startDate" placeholder="Input Tanggal">
-                </div>
-                <div class="ms-1">
-                    <label for="endDate" class="emas fs-8">Sampai Tanggal</label>
-                    <input type="date" id="endDate" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="endDate" placeholder="Input Tanggal">
-                </div>
-                <div>
-                    <button class="btn kuning fw-bolder fs-8 ms-1 px-4 py-2 text-white" style="margin-top:24px;" wire:click="filterTransactions">Filter</button>
-                </div>
-            </div>
-        </div> --}}
     </section>
-
 
     <div class="" style="margin-top:120px; margin-bottom:100px;">
         @forelse ($transactions ?? [] as $transaction)
@@ -93,7 +77,7 @@
                 <div class="abu mx-3 mb-3 rounded border p-3" style="border-color: #ffffff9c !important;">
                     <div class="d-flex align-items-center">
                         <p class="fs-8 fw-bolder mb-1 me-auto text-white">{{ $transaction->appointment_date->format("d/m/Y") }}</p>
-                        <div class="fw-bolder {{ $transaction->status === "completed" ? "btn-bright" : ($transaction->status === "canceled" ? "btn-bright-danger" : ($transaction->status === "approved" ? "btn-bright-primary" : ($transaction->status === "pending" && !empty($transaction->bukti_image) ? "btn-bright-info" : "btn-bright-warning"))) }} fs-9 ms-auto py-1">
+                        <div class="fw-bolder {{ $transaction->status === "completed" ? "btn-bright" : ($transaction->status === "canceled" ? "btn-bright-danger" : ($transaction->status === "approved" ? "btn-bright-primary" : ($transaction->status === "pending" && !empty($transaction->bukti_image) ? "btn-bright-info" : "btn-bright-warning text-white"))) }} fs-9 ms-auto py-1">
                             {{ $transaction->status === "pending" ? (!empty($transaction->bukti_image) ? "Menunggu Konfirmasi" : "Menunggu Pembayaran") : ($transaction->status === "approved" ? "Menunggu Hari" : ($transaction->status === "completed" ? "Selesai" : ($transaction->status === "canceled" ? "Dibatalkan" : ""))) }}
                         </div>
                         <style>
@@ -195,54 +179,85 @@
 
     </div>
 
-
-
-    <div wire:ignore.self class="modal fade align-items-center" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-dark">
+    <div wire:ignore.self class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog" style="margin-top: 80px;">
+            <div class="modal-content bg-dark text-white">
+                <!-- Header Modal -->
                 <div class="modal-header">
                     <h5 class="modal-title emas" id="filterModalLabel">Filter</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
+                <!-- Body Modal -->
                 <div class="modal-body">
                     <form>
-                        <label for="day" class="form-label emas">Filter Harian</label>
-                        <input type="date" id="day" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="day" placeholder="Filter Harian">
+                        <!-- Pilihan Filter -->
+                        <div class="mb-3">
+                            <label for="filterType" class="form-label emas">Pilih Jenis Filter</label>
+                            <select id="filterType" class="form-control bg-dark border-warning text-white" wire:model="filterType" wire:change="filterTransactions">
+                                <option value="">Pilih Filter</option>
+                                <option value="daily">Filter Harian</option>
+                                <option value="monthly">Filter Bulanan</option>
+                                <option value="yearly">Filter Tahunan</option>
+                            </select>
+                        </div>
 
-                        <label for="month" class="form-label emas">Filter Bulanan</label>
-                        <select id="month" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="month">
-                            <option value="">Pilih Bulan</option>
-                            <option value="01">Januari</option>
-                            <option value="02">Februari</option>
-                            <option value="03">Maret</option>
-                            <option value="04">April</option>
-                            <option value="05">Mei</option>
-                            <option value="06">Juni</option>
-                            <option value="07">Juli</option>
-                            <option value="08">Agustus</option>
-                            <option value="09">September</option>
-                            <option value="10">Oktober</option>
-                            <option value="11">November</option>
-                            <option value="12">Desember</option>
-                        </select>
+                        <div>
+                            @if ($filterType === "daily")
+                                <div class="mb-3">
+                                    <label for="day" class="form-label emas">Filter Harian</label>
+                                    <input type="date" id="day" class="form-control bg-dark border-warning text-white" wire:model="day">
+                                </div>
+                            @endif
 
-                        <label for="year" class="form-label emas">Filter Tahunan</label>
-                        <select id="year" class="form-control bg-dark border-warning fs-7 mb-2 border px-3 text-white" wire:model="year">
-                            <option value="">Pilih Tahun</option>
-                            @for ($i = date("Y"); $i >= 2024; $i--)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
+                            @if ($filterType === "monthly")
+                                <div class="mb-3">
+                                    <label for="month" class="form-label emas">Filter Bulanan</label>
+                                    <select id="month" class="form-control bg-dark border-warning text-white" wire:model="month">
+                                        <option value="">Pilih Bulan</option>
+                                        <option value="01">Januari</option>
+                                        <option value="02">Februari</option>
+                                        <option value="03">Maret</option>
+                                        <option value="04">April</option>
+                                        <option value="05">Mei</option>
+                                        <option value="06">Juni</option>
+                                        <option value="07">Juli</option>
+                                        <option value="08">Agustus</option>
+                                        <option value="09">September</option>
+                                        <option value="10">Oktober</option>
+                                        <option value="11">November</option>
+                                        <option value="12">Desember</option>
+                                    </select>
+                                </div>
+                            @endif
+
+                            @if ($filterType === "yearly")
+                                <div class="mb-3">
+                                    <label for="year" class="form-label emas">Filter Tahunan</label>
+                                    <select id="year" class="form-control bg-dark border-warning text-white" wire:model="year">
+                                        <option value="">Pilih Tahun</option>
+                                        @for ($i = date("Y"); $i >= 2024; $i--)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                            @endif
+                        </div>
 
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white">
+
+                <!-- Footer Modal -->
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-warning text-dark" wire:click="filterTransactions" data-bs-dismiss="modal">
                         Filter
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
 
 </div>
 

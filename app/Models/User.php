@@ -46,7 +46,7 @@ class User extends Authenticatable implements FilamentUser
     // Scope untuk filter role
     public function scopeOwners($query)
     {
-        return $query->where('role', UserRole::Owner->value); // Gunakan value dari enum
+        return $query->where('role', UserRole::Owner->value);
     }
 
     public function scopeBarbers($query)
@@ -77,6 +77,17 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        if ($this->isOwner()) {
+            return true; // Hanya owner yang bisa masuk Filament
+        }
+
+        // Redirect sesuai peran pengguna
+        if ($this->isCustomer()) {
+            redirect('/')->send(); // Customer diarahkan ke halaman utama
+        } elseif ($this->isBarber()) {
+            redirect('/home_barber')->send(); // Barber diarahkan ke dashboard barber
+        }
+
+        exit;
     }
 }

@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\MonthTransactionWidget;

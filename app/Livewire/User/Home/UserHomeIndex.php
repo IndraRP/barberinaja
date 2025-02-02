@@ -155,12 +155,6 @@ class UserHomeIndex extends Component
                 'service_id' => $discount->service_id, // Menyimpan service_id
             ]);
 
-            // Simpan ke tabel user_discounts
-            UserDiscount::create([
-                'user_id' => $userId,
-                'discount_id' => $discountId,
-            ]);
-
             $this->alert('success', 'Berhasil!', [
                 'text' => 'Diskon telah diterapkan.'
             ]);
@@ -280,6 +274,7 @@ class UserHomeIndex extends Component
     {
         if ($this->transaction) {
             $this->transaction->status = 'canceled';
+            $this->transaction->canceled = 'user_cancel';
             $this->transaction->save();
 
             \App\Models\BarberSchedule::where('transaction_id', $this->transaction->id)

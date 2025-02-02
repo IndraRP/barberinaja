@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth\Login;
 
+use App\Models\LoginPage;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,12 +14,27 @@ class AuthLoginIndex extends Component
     use LivewireAlert; // Tambahkan trait ini
 
     public $email, $password, $remember;
+    public $logo;
+    public $FB;
+    public $IG;
+    public $TT;
+    public $YT;
+
 
     protected $messages = [
         'required' => 'Harap bagian :attribute diisi.',
         'email' => 'Format email tidak valid.',
         'password.min' => 'Password minimal 8 karakter.',
     ];
+
+    public function mount()
+    {
+        $this->logo = LoginPage::find(1);
+        $this->FB = LoginPage::find(2);
+        $this->TT = LoginPage::find(3);
+        $this->YT = LoginPage::find(4);
+        $this->IG = LoginPage::find(5);
+    }
 
     public function login()
     {

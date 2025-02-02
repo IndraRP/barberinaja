@@ -20,12 +20,12 @@ class Konfirmasi extends Component
         'bukti_image.required' => 'File bukti pembayaran wajib diupload.',
         'bukti_image.image' => 'File harus berupa gambar. Gunakan jpeg, png, jpg, gif, svg, atau webp. ',
         'bukti_image.mimes' => 'Format gambar tidak didukung. Gunakan jpeg, png, jpg, gif, svg, atau webp.',
-        'bukti_image.max' => 'Ukuran file maksimum adalah 5MB.',
+        'bukti_image.max' => 'Ukuran file maksimum adalah 2MB.',
     ];
 
 
     protected $rules = [
-        'bukti_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,JPG,HEIC|max:5120',
+        'bukti_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,JPG,HEIC|max:10240',
     ];
 
     public function mount($transactionId)
@@ -48,7 +48,7 @@ class Konfirmasi extends Component
     {
         try {
             $this->validate([
-                'bukti_image' => 'image|max:2048', // Maksimal 2MB
+                'bukti_image' => 'image|max:10240',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->reset('bukti_image'); // Reset input jika gagal validasi
@@ -74,20 +74,6 @@ class Konfirmasi extends Component
         $this->alert('success', 'Konfirmasi berhasil dilakukan.');
         return redirect()->route('history');
     }
-
-    // public function cancelTransaction()
-    // {
-    //     try {
-    //         $this->transaction->status = 'canceled';
-    //         $this->transaction->save();
-
-    //         session()->flash('success', 'Transaksi berhasil dibatalkan.');
-    //         return redirect()->route('history');
-    //     } catch (Throwable $e) {
-    //         logger()->error('Error membatalkan transaksi: ' . $e->getMessage());
-    //         session()->flash('error', 'Terjadi kesalahan saat membatalkan transaksi.');
-    //     }
-    // }
 
     public function render()
     {

@@ -42,7 +42,6 @@ class Profil extends Component
         $this->image = $this->user->image;
     }
 
-
     public function updateProfile()
     {
         $validatedData = $this->validate([
@@ -74,7 +73,7 @@ class Profil extends Component
 
         try {
             $this->validate([
-                'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:2024',
+                'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:10240',
             ]);
 
             $this->isImageValid = true;
@@ -86,7 +85,7 @@ class Profil extends Component
     public function saveimage()
     {
         $validatedData = $this->validate([
-            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:2024',
+            'imageUpload' => 'nullable|image|mimes:jpeg,png,jpg,JPG,gif,webp|max:10240',
         ]);
 
         if ($this->imageUpload) {
@@ -117,8 +116,8 @@ class Profil extends Component
             'password' => Hash::make($this->new_password),
         ]);
 
-        session()->flash('message', 'Password berhasil diperbarui!');
-        return redirect()->route('profile')->with('message', 'Profil berhasil diperbarui!');
+        $this->alert('success', 'Perubahan berhasil dilakukan.');
+        return redirect()->route('profile');
     }
 
 

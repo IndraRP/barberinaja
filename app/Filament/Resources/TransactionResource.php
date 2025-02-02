@@ -141,15 +141,50 @@ class TransactionResource extends Resource
                     ])
                     ->default('pending'), // Default filter untuk menampilkan 'pending'
             ])
+
+            // EditAction::make()
+            //     ->icon('heroicon-o-pencil-square')
+            //     ->label(''),
+
+            // DeleteAction::make()
+            //     ->icon('heroicon-o-trash')
+            //     ->label(''), // Menghapus label agar hanya ikon yang ditampilkan
+
             ->actions([
-                EditAction::make()
-                    ->icon('heroicon-o-pencil-square')
-                    ->label(''),
+                Action::make('approve')
+                    ->label('Approve')
+                    ->action(function ($record) {
+                        if ($record->status === 'pending') {
+                            $record->update([
+                                'status' => 'approved',
+                            ]);
 
-                DeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->label(''), // Menghapus label agar hanya ikon yang ditampilkan
+                            DB::table('barber_schedules')->insert([
+                                'barber_id' => $record->barber_id,
+                                'transaction_id' => $record->id,
+                                'day' => $record->appointment_date,
+                                'start_time' => $record->time,
+                                'end_time' => \Carbon\Carbon::parse($record->time)->addMinutes(30)->format('H:i:s'),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
 
+                            Notification::make()
+                                ->title('Transaction Approved!')
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Transaction cannot be approved.')
+                                ->danger()
+                                ->send();
+                        }
+                    })
+                    ->icon('heroicon-o-check')
+                    ->requiresConfirmation()
+                    ->color('success'),
+            ])
+            ->actions([
                 Action::make('approve')
                     ->label('Approve')
                     ->action(function ($record) {
@@ -172,12 +207,12 @@ class TransactionResource extends Resource
 
                             // Kirim notifikasi bahwa transaksi telah disetujui
                             Notification::make()
-                                ->title('Transaction Approved!')
+                                ->title('Transaksi Disetujui!')
                                 ->success()
                                 ->send();
                         } else {
                             Notification::make()
-                                ->title('Transaction cannot be approved.')
+                                ->title('Transaksi tidak dapat disetujui.')
                                 ->danger()
                                 ->send();
                         }
@@ -185,7 +220,32 @@ class TransactionResource extends Resource
                     ->icon('heroicon-o-check')
                     ->requiresConfirmation()
                     ->color('success'),
+
+                Action::make('cancel')
+                    ->label('Cancel')
+                    ->action(function ($record) {
+                        if ($record->status !== 'canceled') {
+                            $record->update([
+                                'status' => 'canceled',
+                                'canceled' => 'payment',
+                            ]);
+
+                            Notification::make()
+                                ->title('Transaksi Dibatalkan!')
+                                ->danger()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Transaksi sudah dibatalkan sebelumnya.')
+                                ->warning()
+                                ->send();
+                        }
+                    })
+                    ->icon('heroicon-o-x-circle')
+                    ->requiresConfirmation()
+                    ->color('danger'),
             ])
+
             ->bulkActions([
                 BulkAction::make('delete_selected')
                     ->label('Delete Selected')
@@ -202,9 +262,15 @@ class TransactionResource extends Resource
                     })
                     ->icon('heroicon-o-trash'),
             ])
-            ->modifyQueryUsing(fn($query) => $query->when(request()->input('filters')['status'] ?? null, function ($query, $status) {
-                return $query->where('status', $status);
-            })->latest());
+            ->modifyQueryUsing(
+                fn($query) => $query
+                    ->where('status', 'pending')
+                    ->whereNotNull('bukti_image')
+                    ->when(request()->input('filters')['status'] ?? null, function ($query, $status) {
+                        return $query->where('status', $status);
+                    })
+                    ->latest()
+            );
     }
 
     public static function getRelations(): array
@@ -218,8 +284,8 @@ class TransactionResource extends Resource
     {
         return [
             'index' => Pages\ListTransactions::route('/'),
-            'create' => Pages\CreateTransaction::route('/create'),
-            'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            // 'create' => Pages\CreateTransaction::route('/create'),
+            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 }

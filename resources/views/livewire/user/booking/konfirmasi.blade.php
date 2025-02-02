@@ -63,7 +63,9 @@
             <div class="text-start">
                 <div class="d-flex justify-content-between align-items-center fs-10 p-1 text-white" onclick="copyAccountNumber()" wire:click="showAlert">
                     <p class="m-0">No Rekening</p>
-                    <div class="col-2 fs-6 m-0 ms-5 p-0 text-end"><i class="bi bi-copy"></i></div>
+                    <div x-data="{ active: false }" @click="active = !active" class="col-2 fs-6 m-0 ms-5 p-0 text-end">
+                        <i :class="active ? 'emas' : 'text-white'" class="bi bi-copy"></i>
+                    </div>
                     <p class="m-0" id="accountNumber">123456789123</p>
                 </div>
 
@@ -88,7 +90,7 @@
 
         <!-- Form Upload Bukti Pembayaran -->
         <div class="abu mb-4 rounded border px-3 pb-4" style="border-color: #4343433a !important;">
-            <h5 class="fs-6 fw-bolder fs-5 mb-0 mt-4 text-white">Upload Bukti bhgu Pembayaran</h5>
+            <h5 class="fs-6 fw-bolder fs-5 mb-0 mt-4 text-white">Upload Bukti Pembayaran</h5>
             <hr class="text-secondary px-2">
             <div>
                 <input type="file" wire:model="bukti_image" class="form-control">

@@ -11,7 +11,13 @@ class Riwayat extends Component
     public $user;
     public $doneSchedules = [];
     public $pendingSchedules = [];
-    public $filter = 'pending'; // Menetapkan filter default
+    public $filter = 'pending';
+
+
+    public $day;
+    public $month;
+    public $year;
+    public $filterType;
 
     public function mount()
     {
@@ -31,45 +37,63 @@ class Riwayat extends Component
         $this->loadSchedules();
     }
 
+    public function updatedFilterType($value)
+    {
+        $this->day = null;
+        $this->month = null;
+        $this->year = null;
+        $this->loadSchedules();
+    }
+
     public function loadSchedules()
     {
-        // Ambil jadwal berdasarkan filter yang dipilih
+        $query = BarberSchedule::where('barber_id', $this->user->id)
+            ->with(['transaction.details.service', 'transaction.customer']);
+
+        // Filter status
         if ($this->filter === 'done') {
-            $this->doneSchedules = BarberSchedule::where('barber_id', $this->user->id)
-                ->where('status', 'done')
-                ->with(['transaction.details.service'])
-                ->get()
-                ->map(function ($schedule) {
-                    $schedule->formatted_date = $schedule->day
-                        ? \Carbon\Carbon::parse($schedule->day)->format('d F Y')
-                        : 'Tanggal Tidak Tersedia';
-
-                    $schedule->formatted_time = $schedule->start_time && $schedule->end_time
-                        ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($schedule->end_time)->format('H:i')
-                        : 'Waktu Tidak Tersedia';
-
-                    $schedule->customer_name = $schedule->transaction->customer->name ?? 'Nama Tidak Tersedia';
-
-                    return $schedule;
-                });
+            $query->where('status', 'done');
         } else {
-            $this->pendingSchedules = BarberSchedule::where('barber_id', $this->user->id)
-                ->where('status', 'pending')
-                ->with(['transaction.details.service'])
-                ->get()
-                ->map(function ($schedule) {
-                    $schedule->formatted_date = $schedule->day
-                        ? \Carbon\Carbon::parse($schedule->day)->format('d F Y')
-                        : 'Tanggal Tidak Tersedia';
+            $query->where('status', 'pending');
+        }
 
-                    $schedule->formatted_time = $schedule->start_time && $schedule->end_time
-                        ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($schedule->end_time)->format('H:i')
-                        : 'Waktu Tidak Tersedia';
+        // Filter tanggal
+        $query->when($this->filterType === 'daily' && $this->day, function ($q) {
+            $q->whereDate('day', $this->day);
+        });
 
-                    $schedule->customer_name = $schedule->transaction->customer->name ?? 'Nama Tidak Tersedia';
+        $query->when($this->filterType === 'monthly' && $this->month, function ($q) {
+            $year = $this->year ?? date('Y');
+            $q->whereYear('day', $year)->whereMonth('day', $this->month);
+        });
 
-                    return $schedule;
-                });
+        $query->when($this->filterType === 'yearly' && $this->year, function ($q) {
+            $q->whereYear('day', $this->year);
+        });
+
+        // Urutkan hasil
+        $query->orderByRaw("FIELD(status, 'approved') DESC")
+            ->orderBy('day', 'desc');
+
+        // Ambil data dan format
+        $schedules = $query->get()->map(function ($schedule) {
+            $schedule->formatted_date = $schedule->day
+                ? \Carbon\Carbon::parse($schedule->day)->format('d F Y')
+                : 'Tanggal Tidak Tersedia';
+
+            $schedule->formatted_time = $schedule->start_time && $schedule->end_time
+                ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($schedule->end_time)->format('H:i')
+                : 'Waktu Tidak Tersedia';
+
+            $schedule->customer_name = $schedule->transaction->customer->name ?? 'Nama Tidak Tersedia';
+
+            return $schedule;
+        });
+
+        if ($this->filter === 'done') {
+            $this->doneSchedules = $schedules;
+        } else {
+            $this->pendingSchedules = $schedules;
         }
     }
 

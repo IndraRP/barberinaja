@@ -1,6 +1,6 @@
-@section('title', 'Form')
+@section("title", "Form")
 
-@section('styles')
+@section("styles")
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
@@ -235,25 +235,21 @@
 
 <div class="pb-4">
     <div class="d-flex justify-content-start align-items-center">
-        <a href="javascript:void(0);" class="p-3 text-white"
-            style="font-size: 24px; border-radius: 50%; margin-right: 10px; background-color: transparent;"
-            onclick="history.back();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+        <a href="javascript:void(0);" class="p-3 text-white" style="font-size: 24px; border-radius: 50%; margin-right: 10px; background-color: transparent;" onclick="history.back();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M15 6l-6 6l6 6" onclick="history.back();">
             </svg>
         </a>
 
-        <h1 class="mb-0 text-emas fs-3">Form Pemesanan</h1>
+        <h1 class="text-emas fs-3 mb-0">Form Pemesanan</h1>
     </div>
 
     <div class="mx-3 mt-1">
         <form wire:submit.prevent="submitBooking">
             <!-- Data Diri -->
             <div class="">
-                <hr class="text-emas border-2 p-0 m-0">
+                <hr class="text-emas m-0 border-2 p-0">
 
                 <div class="my-3">
                     <label for="name" class="form-label">Nama</label>
@@ -262,8 +258,7 @@
 
                 <div class="mb-3">
                     <label for="phone_number" class="form-label">Nomor Telepon</label>
-                    <input type="tel" class="form-control text-white" id="phone_number" wire:model="phone_number"
-                        required>
+                    <input type="tel" class="form-control text-white" id="phone_number" wire:model="phone_number" required>
                 </div>
             </div>
             <!-- Pilih Barber -->
@@ -272,12 +267,12 @@
                 <select class="form-select" id="barber" wire:model="barber_id" required>
                     <option value="" selected>Barber Kami</option>
                     @foreach ($barbers as $barber)
-                        <option value="{{ $barber->id }}" data-image="{{ asset('storage/' . $barber->image) }}">
+                        <option value="{{ $barber->id }}" data-image="{{ asset("storage/" . $barber->image) }}">
                             {{ $barber->name }}
                         </option>
                     @endforeach
                 </select>
-                @error('barber_id')
+                @error("barber_id")
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
@@ -288,9 +283,8 @@
                 <!-- Hanya tampilkan input tanggal jika barber telah dipilih -->
                 <div class="mb-3">
                     <label for="tanggal" class="form-label">Dipesan untuk tgl.</label>
-                    <input type="date" id="tanggal" class="form-control" wire:model.live="tanggal"
-                        min="{{ now()->format('Y-m-d') }}" required>
-                    @error('tanggal')
+                    <input type="date" id="tanggal" class="form-control" wire:model.live="tanggal" min="{{ now()->format("Y-m-d") }}" required>
+                    @error("tanggal")
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
@@ -299,36 +293,33 @@
             <!-- Waktu -->
 
             @if ($tanggal)
-                <div class="mb-5 pb-4 mx-1" wire:loading.class="loading">
+                <div class="mx-1 mb-5 pb-4" wire:loading.class="loading">
                     <label for="time" class="form-label text-emas">Pertemuan dimulai pada</label>
                     <div class="d-flex justify-content-between flex-wrap">
                         @foreach ($times as $time)
                             @php
                                 $isTimeTaken = in_array($time, $takenTimes);
                             @endphp
-                            <button type="button"
-                                class="btn btn-time fs-10 {{ $time == $this->time ? 'active' : '' }} 
-                                {{ $isTimeTaken ? 'taken-time' : '' }}"
-                                wire:click="setTime('{{ $time }}')" {{ $isTimeTaken ? 'disabled' : '' }}>
+                            <button type="button" class="btn btn-time fs-10 {{ $time == $this->time ? "active" : "" }} {{ $isTimeTaken ? "taken-time" : "" }}" wire:click="setTime('{{ $time }}')" {{ $isTimeTaken ? "disabled" : "" }}>
                                 {{ $time }}
                             </button>
                         @endforeach
                     </div>
-                    @error('time')
-                        <span class="text-danger">{{ $message }}</span>
+                    @error("time")
+                        <span class="text-danger">Jadwal ini Wajib Diisi !!!</span>
                     @enderror
                 </div>
             @endif
 
             <!-- Tombol Pesan -->
-            <div class="d-flex justify-content-center pt-3 pb-2 fixed-bottom bawah">
-                <button type="submit" class="btn kuning text-white py-2 px-4">Pesan Sekarang</button>
+            <div class="d-flex justify-content-center fixed-bottom bawah pb-2 pt-3">
+                <button type="submit" class="btn kuning px-4 py-2 text-white">Pesan Sekarang</button>
             </div>
         </form>
     </div>
 </div>
 
-@push('scripts')
+@push("scripts")
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 

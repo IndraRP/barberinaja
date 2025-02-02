@@ -16,11 +16,7 @@ class Riwayat extends Component
     public $day;
     public $month;
     public $year;
-    public $filterType = 'daily';
-
-    // public $startDate;
-    // public $endDate;
-
+    public $filterType;
 
     public function mount()
     {
@@ -35,6 +31,14 @@ class Riwayat extends Component
         $this->filterTransactions();
     }
 
+    public function updatedFilterType($value)
+    {
+        $this->day = null;
+        $this->month = null;
+        $this->year = null;
+    }
+
+
     public function filterTransactions()
     {
         if (!auth()->check()) {
@@ -42,9 +46,6 @@ class Riwayat extends Component
         }
 
         $customerId = auth()->user()->id;
-
-        // Variabel untuk menentukan apakah filter tanggal digunakan
-        $filterDateApplied = false;
 
         // Ambil transaksi sesuai filter
         $this->transactions = Transaction::with('details.service', 'barber')
@@ -58,23 +59,22 @@ class Riwayat extends Component
                     $query->where('status', $this->filter);
                 }
             })
-            ->when($this->startDate && $this->endDate, function ($query) use (&$filterDateApplied) {
-                // Filter berdasarkan rentang tanggal
-                $query->whereBetween('appointment_date', [$this->startDate, $this->endDate]);
-
-                // Set filter tanggal diterapkan
-                $filterDateApplied = true;
+            ->when($this->filterType === 'daily' && $this->day, function ($query) {
+                $query->whereDate('appointment_date', $this->day); // Filter harian
             })
-            ->orderByRaw("FIELD(status, 'approved') DESC")
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->when($this->filterType === 'monthly' && $this->month, function ($query) {
+                $year = $this->year ?? date('Y');
+                $query->whereYear('appointment_date', $year)
+                    ->whereMonth('appointment_date', $this->month); // Filter bulanan
+            })
 
-        // Menampilkan alert hanya jika filter tanggal digunakan
-        if ($filterDateApplied) {
-            $this->alert('success', 'Berhasil!', [
-                'text' => 'Filter tanggal telah diterapkan.'
-            ]);
-        }
+            ->when($this->filterType === 'yearly' && $this->year, function ($query) {
+                $query->whereYear('appointment_date', $this->year); // Filter tahunan
+            })
+            // ->orderByRaw("FIELD(status, 'approved') DESC")
+            // ->orderBy('id', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
         // Manipulasi status transaksi 'arrived' menjadi 'completed' saat menampilkan data
         $this->transactions->transform(function ($transaction) {
@@ -90,29 +90,24 @@ class Riwayat extends Component
         }
     }
 
+    public function setDateFilter($type)
+    {
+        $this->filterType = $type;
+
+        // Reset nilai day, month, dan year saat jenis filter diubah
+        $this->day = null;
+        $this->month = null;
+        $this->year = null;
+
+        $this->filterTransactions();
+    }
+
 
     public function setFilter($status)
     {
         $this->filter = $status;
         $this->filterTransactions();
     }
-
-    public function swipeFilter($direction)
-    {
-        $keys = array_keys($this->statuses); // Ambil semua kunci filter
-        $currentIndex = array_search($this->filter, $keys);
-
-        if ($direction === 'next' && $currentIndex < count($keys) - 1) {
-            // Jika swipe kiri, pindah ke filter berikutnya
-            $this->filter = $keys[$currentIndex + 1];
-        } elseif ($direction === 'previous' && $currentIndex > 0) {
-            // Jika swipe kanan, pindah ke filter sebelumnya
-            $this->filter = $keys[$currentIndex - 1];
-        }
-
-        $this->filterTransactions(); // Perbarui daftar transaksi
-    }
-
 
     public function render()
     {

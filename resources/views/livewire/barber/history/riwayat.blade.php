@@ -33,19 +33,12 @@
 @endsection
 
 <div>
-    <div class="d-flex justify-content-center abu align-items-center position-relative fixed py-4">
-        <!-- Icon Kembali -->
-        <a href="/home_berber" class="position-absolute start-0 p-3 text-white" style="font-size: 24px; border-radius: 50%; background-color: transparent;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M15 6l-6 6l6 6" />
-            </svg>
-        </a>
-
-        <h6 class="w-100 fw-bolder mb-0 pt-1 text-white" style="margin-left: 60px;">Jadwal Selesai</h6>
+    <div class="d-flex justify-content-center atas align-items-center fixed-top py-4">
+        <h6 class="w-100 fw-bolder mb-0 ms-3 pt-1 text-white">Riwayat Pekerjaan</h6>
+        <i class="bi bi-funnel-fill fs-6 me-3 mt-2 text-white" data-bs-toggle="modal" data-bs-target="#filterModal"></i>
     </div>
 
-    <div>
+    <div style="margin-top: 80px;" class="fixed-top bg-dark">
         <ul class="custom-nav-tabs justify-content-center d-flex mt-3 p-0" role="tablist">
             <li class="custom-nav-item" role="presentation">
                 <a class="custom-nav-link {{ $filter === "pending" ? "active" : "" }}" wire:click="setFilter('pending')" role="tab">
@@ -60,21 +53,21 @@
         </ul>
     </div>
 
-    <div class="px-3 pb-3">
+    <div class="px-3 pb-3" style="margin-top: 135px;">
         @if (($filter === "done" && $doneSchedules->isEmpty()) || ($filter === "pending" && $pendingSchedules->isEmpty()))
             <!-- Menampilkan animasi jika salah satu filter kosong -->
-            <div class="d-flex justify-content-center align-items-center pb-5" style="margin-top: 100px;">
-                <div class="text-center">
-                    <div id="lottie" class="d-flex justify-content-center align-items-center mx-auto" wire.ignore style="width: 150px; height: 150px; transform: translateY(-10px);"></div>
-                    <p class="fs-6 emas d-block" style="margin-top: -27px;">
-                        @if ($filter === "pending")
-                            Belum ada pekerjaan <br><span>hari ini</span>
-                        @else
-                            Anda belum mengerjakan sama sekali.
-                        @endif
-                    </p>
+            <div x-data="lottieAnimation()" class="d-flex justify-content-center align-items-center" style="margin-top: 250px;">
+                <div x-ref="lottie" class="d-flex justify-content-center align-items-center mx-auto" style="width: 150px; height: 150px; transform: translateY(-10px);" wire:ignore>
                 </div>
             </div>
+
+            <p class="fs-6 emas d-block text-center" style="margin-top: -27px;">
+                @if ($filter === "pending")
+                    Belum ada pekerjaan <br><span>hari ini</span>
+                @else
+                    Anda belum mengerjakan sama sekali.
+                @endif
+            </p>
         @else
             <!-- Menampilkan jadwal berdasarkan filter -->
             <ul class="list-group fs-8 mb-5 pb-5 pt-1">
@@ -106,6 +99,86 @@
             </ul>
         @endif
     </div>
+
+    <div wire:ignore.self class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog" style="margin-top: 80px;">
+            <div class="modal-content bg-dark text-white">
+                <!-- Header Modal -->
+                <div class="modal-header">
+                    <h5 class="modal-title emas" id="filterModalLabel">Filter</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Body Modal -->
+                <div class="modal-body">
+                    <form>
+                        <!-- Pilihan Filter -->
+                        <div class="mb-3">
+                            <label for="filterType" class="form-label emas">Pilih Jenis Filter</label>
+                            <select id="filterType" class="form-control bg-dark border-warning text-white" wire:model="filterType" wire:change="loadSchedules">
+                                <option value="">Pilih Filter</option>
+                                <option value="daily">Filter Harian</option>
+                                <option value="monthly">Filter Bulanan</option>
+                                <option value="yearly">Filter Tahunan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            @if ($filterType === "daily")
+                                <div class="mb-3">
+                                    <label for="day" class="form-label emas">Filter Harian</label>
+                                    <input type="date" id="day" class="form-control bg-dark border-warning text-white" wire:model="day">
+                                </div>
+                            @endif
+
+                            @if ($filterType === "monthly")
+                                <div class="mb-3">
+                                    <label for="month" class="form-label emas">Filter Bulanan</label>
+                                    <select id="month" class="form-control bg-dark border-warning text-white" wire:model="month">
+                                        <option value="">Pilih Bulan</option>
+                                        <option value="01">Januari</option>
+                                        <option value="02">Februari</option>
+                                        <option value="03">Maret</option>
+                                        <option value="04">April</option>
+                                        <option value="05">Mei</option>
+                                        <option value="06">Juni</option>
+                                        <option value="07">Juli</option>
+                                        <option value="08">Agustus</option>
+                                        <option value="09">September</option>
+                                        <option value="10">Oktober</option>
+                                        <option value="11">November</option>
+                                        <option value="12">Desember</option>
+                                    </select>
+                                </div>
+                            @endif
+
+                            @if ($filterType === "yearly")
+                                <div class="mb-3">
+                                    <label for="year" class="form-label emas">Filter Tahunan</label>
+                                    <select id="year" class="form-control bg-dark border-warning text-white" wire:model="year">
+                                        <option value="">Pilih Tahun</option>
+                                        @for ($i = date("Y"); $i >= 2024; $i--)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                            @endif
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Footer Modal -->
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-warning text-dark" wire:click="loadSchedules" data-bs-dismiss="modal">
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
@@ -116,12 +189,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
 
     <script>
-        var animation = lottie.loadAnimation({
-            container: document.getElementById('lottie'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: '{{ asset("images/Animation1.json") }}'
-        });
+        function lottieAnimation() {
+            return {
+                init() {
+                    lottie.loadAnimation({
+                        container: this.$refs.lottie,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: '{{ asset("images/Animation1.json") }}'
+                    });
+                }
+            }
+        }
     </script>
 @endpush

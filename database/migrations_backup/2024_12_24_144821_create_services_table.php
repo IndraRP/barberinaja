@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('services', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->text('description')->nullable();
-        $table->decimal('price', 10, 2);
-        $table->string('image')->nullable();
-        $table->enum('status', ['active', 'blocked'])->default('active'); 
-        $table->timestamps();
-    });
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->string('image')->nullable();
+            $table->enum('status', ['active', 'blocked'])->default('active');
+            $table->enum('gender', ['male', 'female', 'unisex'])->default('unisex');
+            $table->timestamps();
+        });
     }
 
     /**

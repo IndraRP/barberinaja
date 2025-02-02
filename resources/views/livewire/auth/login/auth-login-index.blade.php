@@ -23,7 +23,7 @@
 <div class="container mt-1" id="bg-container" style="padding-top:50px; padding-bottom:92px;">
     <div class="row justify-content-center">
         <div class="d-flex justify-content-end w-100 mb-2 me-4 pe-4">
-            <img src="{{ asset("images/Barberinaja_logo.png") }}" alt="Logo" style="width:150px">
+            <img src="{{ asset("storage/" . $this->logo->image) }}" alt="Logo" style="width:150px">
         </div>
         <div class="col-md-6 col-sm-8 col-12">
             <div class="mx-3 mt-4 rounded py-4 shadow-md">
@@ -78,19 +78,19 @@
             <div class="d-flex align-items-center ms-3 mt-4 px-4">
                 <div class="p-12rounded d-flex align-items-center">
                     <div class="atas ms-2 rounded p-1">
-                        <img src="https://freepnglogo.com/images/all_img/1691751275tiktok-logo-png-black-and-white.png" alt="Logo" style="width:20px">
+                        <img src="{{ asset("storage/" . $this->FB->image) }}" alt="Logo" style="width:23px">
                     </div>
 
                     <div class="atas ms-2 rounded p-1">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/480px-Instagram_logo_2022.svg.png" alt="Logo" style="width:20px">
+                        <img src="{{ asset("storage/" . $this->TT->image) }}" alt="Logo" style="width:23px">
                     </div>
 
                     <div class="atas ms-2 rounded p-1">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/2048px-Facebook_f_logo_%282019%29.svg.png" alt="Logo" style="width:20px">
+                        <img src="{{ asset("storage/" . $this->YT->image) }}" alt="Logo" style="width:23px">
                     </div>
 
                     <div class="atas ms-2 rounded p-1">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" alt="Logo" style="width:20px">
+                        <img src="{{ asset("storage/" . $this->IG->image) }}" alt="Logo" style="width:23px">
                     </div>
                 </div>
             </div>

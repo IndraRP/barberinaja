@@ -107,7 +107,7 @@ class BarberResource extends Resource
 
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
-                    ->label(''), // Menghapus label agar hanya ikon yang ditampilkan
+                    ->label(''),
             ]);
     }
 

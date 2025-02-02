@@ -143,8 +143,8 @@
                     </div>
                     <div class="modal-footer d-flex justify-content-center border-0">
                         <div>
-                            <button type="button" class="btn kuning fs-7 fw-bolder px-3 py-2 text-white" wire:click="startNow">Kerjakan Sekarang</button>
                             <button type="button" class="btn btn-secondary fs-7 fw-bolder px-3 py-2 text-white" wire:click="startLater">Kerjakan Nanti</button>
+                            <button type="button" class="btn kuning fs-7 fw-bolder px-3 py-2 text-white" wire:click="startNow">Kerjakan Sekarang</button>
                         </div>
                     </div>
                 </div>

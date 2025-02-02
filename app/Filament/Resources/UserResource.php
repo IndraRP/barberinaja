@@ -51,7 +51,7 @@ class UserResource extends Resource
                 Forms\Components\Select::make('role')
                     ->label('Peran')
                     ->options([
-                        'customer' => 'Customer', // Hanya role customer yang bisa dipilih
+                        'customer' => 'Customer',
                     ])
                     ->default('customer')
                     ->required(),
@@ -73,6 +73,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
                 TextColumn::make('name')->label('Nama')->searchable(),
+                TextColumn::make('gender')->label('Gender')->searchable(),
                 TextColumn::make('email')->label('Email')->searchable(),
                 TextColumn::make('phone_number')->label('Nomor Handphone')->searchable()->sortable(),
                 BadgeColumn::make('role')
@@ -100,8 +101,7 @@ class UserResource extends Resource
                     ])
                     ->default('customer'),
             ])
-            ->actions([
-            ])
+            ->actions([])
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title', 'Barberman Apps')</title>
+    <title>@yield("title", "Barberman Apps")</title>
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
@@ -33,24 +33,21 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
-    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset("css/home.css") }}">
 
     <!-- Custom Styles -->
-    @yield('styles')
+    @yield("styles")
     @livewireStyles
 
 </head>
 
 <body class="bg-dark text-gray-900">
-    @if (
-        !in_array(Route::currentRouteName(), [
-            'login',
-        ]))
-        @include('layouts.navbar_barber')
+    @if (!in_array(Route::currentRouteName(), ["login"]))
+        @include("layouts.navbar_barber")
     @endif
 
     <!-- Page Content -->
-    @yield('content')
+    @yield("content")
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@3.6.12/dist/js/splide.min.js"></script>
@@ -60,8 +57,27 @@
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-    @stack('scripts')
+    @stack("scripts")
     @livewireScripts
+
+    {{-- DISABLE RIGHT CLICK  --}}
+    {{-- <script>
+        var isNS = (navigator.appName == "Netscape") ? 1 : 0;
+        if (navigator.appName == "Netscape") document.captureEvents(Event.MOUSEDOWN || Event.MOUSEUP);
+
+        function mischandler() {
+            return false;
+        }
+
+        function mousehandler(e) {
+            var myevent = (isNS) ? e : event;
+            var eventbutton = (isNS) ? myevent.which : myevent.button;
+            if ((eventbutton == 2) || (eventbutton == 3)) return false;
+        }
+        document.oncontextmenu = mischandler;
+        document.onmousedown = mousehandler;
+        document.onmouseup = mousehandler;
+    </script> --}}
 </body>
 
 </html>

@@ -34,7 +34,8 @@ class DashboardStatsWidget extends BaseWidget
 
             Card::make('Transaksi belum Approve', Transaction::where('status', 'pending')->whereNotNull('bukti_image')->count())
                 ->description('Jumlah Transaksi yang belum anda Approve')
-                ->icon('heroicon-o-archive-box-arrow-down'),
+                ->icon('heroicon-o-archive-box-arrow-down')
+                ->url('/admin/transactions', true),
 
             Card::make('Jumlah Layanan', Service::count())
                 ->description('Total layanan yang tersedia')
@@ -45,7 +46,7 @@ class DashboardStatsWidget extends BaseWidget
                 ->icon('heroicon-o-users'),
 
             Card::make('Transaksi Hari Ini', Transaction::whereDate('created_at', Carbon::today())
-                ->whereNotNull('bukti_image')  // Menambahkan kondisi untuk memastikan bukti_image ada
+                ->whereNotNull('bukti_image')
                 ->count())
                 ->description('Jumlah transaksi yang terjadi hari ini')
                 ->icon('heroicon-o-banknotes'),

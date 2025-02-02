@@ -63,8 +63,10 @@
         .edit-icon {
             background: #ffffff;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            margin-top: 35px;
+            margin-left: 35px;
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -162,9 +164,9 @@
             <div class="profile-card">
                 <div class="profile-header"></div>
 
-                <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
+                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
 
-                <div class="edit-icon mt-5" data-bs-toggle="modal" data-bs-target="#editimageModal">
+                <div class="edit-icon" data-bs-toggle="modal" data-bs-target="#editimageModal">
                     <i class="bi bi-camera-fill emas fw-bold fs-6"></i>
                 </div>
 
@@ -186,7 +188,7 @@
 
                     <a href="mailto:indra@gmail.com?subject=Hubungi%20Kami&body=Halo,%20saya%20ingin%20menghubungi%20Anda" class="text-decoration-none">
                         <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2">
-                            <i class="fa-solid fa-square-phone emas fw-bold icon-size"></i>
+                            <i class="bi bi-envelope-at-fill emas fw-bold icon-size2"></i>
                             <h1 class="fs-7 mx-3 pt-2 text-white">Hubungi Kami</h1>
                             <i class="fa-solid fa-chevron-right chevron-right emas ms-auto"></i>
                         </div>
@@ -213,12 +215,12 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div wire:ignore.self class="modal fade align-items-center" id="editimageModal" tabindex="-1"aria-labelledby="editimageModalLabel" aria-hidden="true">
+    <!-- Modal Image-->
+    <div wire:ignore.self class="modal fade align-items-center" id="editimageModal" tabindex="-1" aria-labelledby="editimageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
-                    <h5 class="modal-title emas" id="editimageModalLabel">Edit Foto Profile</h5>
+                    <h5 class="modal-title emas" id="editimageModalLabel">Edit Foto Profile Barbergfv</h5>
                 </div>
                 <div class="modal-body">
                     <form wire:submit.prevent="saveimage">
@@ -244,8 +246,8 @@
                             </div>
                         </div>
                     </form>
-
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="kuning border-warning rounded border px-3 py-1 text-white" wire:click="saveimage" wire:loading.attr="disabled">
                         <span wire:loading.remove>Ubah Gambar</span>
@@ -294,14 +296,23 @@
                         <div class="mb-3">
                             <label for="password" class="form-label emas">Kata Sandi Lama</label>
                             <input type="password" class="form-control bg-modal" id="password" placeholder="Ketik di sini" wire:model.defer="password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('password', 'password-icon')" style="cursor: pointer; margin-top: 55px; margin-right:35px;">
+                                <i id="password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label emas">Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="new_password" placeholder="Ketik di sini" wire:model.defer="new_password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('new_password', 'new-password-icon')" style="cursor: pointer; margin-top: 140px; margin-right:35px;">
+                                <i id="new-password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label emas">Konfirmasi Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="confirm_password" placeholder="Ketik di sini" wire:model.defer="confirm_password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('confirm_password', 'confirm-password-icon')" style="cursor: pointer; margin-top: 225px; margin-right:35px;">
+                                <i id="confirm-password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                     </form>
                 </div>
@@ -333,3 +344,23 @@
     </div>
 
 </div>
+
+
+@push("scripts")
+    <script>
+        function togglePassword(inputId, iconId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+@endpush

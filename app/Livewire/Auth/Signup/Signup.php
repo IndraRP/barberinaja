@@ -10,7 +10,7 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 class Signup extends Component
 {
     use LivewireAlert; // Tambahkan trait ini
-    public $name, $email, $phone_number, $password, $password_confirmation, $role = 'customer';
+    public $name, $email, $phone_number, $password, $password_confirmation, $role = 'customer', $gender;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -28,6 +28,7 @@ class Signup extends Component
         User::create([
             'name' => $this->name,
             'email' => $this->email,
+            'gender' => $this->gender,
             'phone_number' => $this->phone_number,
             'password' => Hash::make($this->password),
             'role' => $this->role,
@@ -40,7 +41,7 @@ class Signup extends Component
     public function render()
     {
         return view('livewire.auth.signup.signup')
-        ->extends('layouts.app')
-        ->section('content');
+            ->extends('layouts.app')
+            ->section('content');
     }
 }

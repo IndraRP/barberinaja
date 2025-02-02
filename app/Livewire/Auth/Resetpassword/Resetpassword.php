@@ -4,10 +4,14 @@ namespace App\Livewire\Auth\Resetpassword;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
 
 class Resetpassword extends Component
 {
+    use LivewireAlert;
+
     public $token;
     public $email;
     public $password;
@@ -18,6 +22,13 @@ class Resetpassword extends Component
         'password_confirmation' => 'required',
     ];
 
+    protected $messages = [
+        'password.required' => 'Kata sandi wajib diisi.',
+        'password.min' => 'Kata sandi harus memiliki minimal 8 karakter.',
+        'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+        'password_confirmation.required' => 'Konfirmasi kata sandi wajib diisi.',
+    ];
+
     public function mount($token, $email)
     {
         $this->token = $token;
@@ -26,7 +37,14 @@ class Resetpassword extends Component
 
     public function resetPassword()
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $this->alert('error', 'Validasi Gagal!', [
+                'text' => collect($e->validator->errors()->all())->implode("\n")
+            ]);
+            return;
+        }
 
         $status = Password::reset(
             [
@@ -42,17 +60,21 @@ class Resetpassword extends Component
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            session()->flash('status', 'Password berhasil direset.');
+            $this->alert('success', 'Berhasil!', [
+                'text' => 'Password berhasil direset.'
+            ]);
             return redirect()->to('/login');
         } else {
-            session()->flash('error', 'Reset password gagal.');
+            $this->alert('error', 'Gagal!', [
+                'text' => 'Password gagal direset.'
+            ]);
         }
     }
 
     public function render()
     {
         return view('livewire.auth.resetpassword.resetpassword')
-        ->extends('layouts.app')
-        ->section('content');
+            ->extends('layouts.app')
+            ->section('content');
     }
 }

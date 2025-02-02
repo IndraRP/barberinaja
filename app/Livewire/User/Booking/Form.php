@@ -25,6 +25,10 @@ class Form extends Component
     public $barbers = [];
     public $takenTimes = [];
 
+    protected $rules = [
+        'time' => 'required',
+    ];
+
     public function mount($id)
     {
         $this->barbers = Barber::whereBetween('id', [28, 32])->get();
@@ -87,14 +91,13 @@ class Form extends Component
 
     public function submitBooking()
     {
+        if ($this->validate());
 
         if ($this->phone_number && strlen($this->phone_number) < 10) {
             $this->alert('error', 'Nomor telepon harus terdiri antara 10 hingga 13 angka.');
             return;
         }
 
-        // Menangani validasi secara langsung, jika gagal, akan otomatis mengarah ke error
-        // Jika validasi berhasil, lanjutkan dengan pemesanan
         $existingSchedule = BarberSchedule::where('barber_id', $this->barber_id)
             ->where('day', $this->tanggal)
             ->where('start_time', $this->time)
@@ -103,7 +106,7 @@ class Form extends Component
 
         if ($existingSchedule) {
             $this->alert('error', 'Jadwal sudah diambil.');
-            return; // Jangan lanjutkan jika jadwal sudah ada
+            return;
         }
 
         $barber = Barber::find($this->barber_id);

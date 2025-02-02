@@ -63,8 +63,10 @@
         .edit-icon {
             background: #ffffff;
             border-radius: 50%;
-            width: 27px;
-            height: 27px;
+            margin-top: 35px;
+            margin-left: 35px;
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -162,21 +164,35 @@
             <div class="profile-card">
                 <div class="profile-header"></div>
 
-                <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
+                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
 
                 <!-- Modal untuk Foto Besar -->
-                <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+                <div class="modal fade" wire:ignore.self id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered border-0">
-                        <div class="modal-body bg-dark rounded" style="width: 330px; height: 330px; object-fit: cover;">
+                        <div class="modal-body bg-dark rounded border border-white" style="width: 330px; height: 330px; object-fit: cover;">
                             <!-- Gambar Besar di dalam Modal -->
-                            <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" class="img-fluid d-block mx-auto rounded border-0" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
+                            <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="img-fluid d-block mx-auto rounded border-0" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
                         </div>
                     </div>
                 </div>
 
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var modal = document.getElementById("profileModal");
+                        var modalDialog = modal.querySelector(".modal-dialog");
+
+                        // Menutup modal hanya jika klik di luar modal-dialog
+                        modal.addEventListener("click", function(event) {
+                            if (!modalDialog.contains(event.target)) {
+                                var bsModal = bootstrap.Modal.getInstance(modal);
+                                bsModal.hide();
+                            }
+                        });
+                    });
+                </script>
 
 
-                <div class="edit-icon mt-5" data-bs-toggle="modal" data-bs-target="#editimageModal">
+                <div class="edit-icon" data-bs-toggle="modal" data-bs-target="#editimageModal">
                     <i class="bi bi-camera-fill emas fw-bold fs-6"></i>
                 </div>
 
@@ -198,7 +214,7 @@
 
                     <a href="mailto:indra@gmail.com?subject=Hubungi%20Kami&body=Halo,%20saya%20ingin%20menghubungi%20Anda" class="text-decoration-none">
                         <div class="d-flex align-items-center edit-profile mx-2 mt-1 rounded px-3 py-2">
-                            <i class="fa-solid fa-square-phone emas fw-bold icon-size"></i>
+                            <i class="bi bi-envelope-at-fill emas fw-bold icon-size2"></i>
                             <h1 class="fs-7 mx-3 pt-2 text-white">Hubungi Kami</h1>
                             <i class="fa-solid fa-chevron-right chevron-right emas ms-auto"></i>
                         </div>
@@ -214,7 +230,7 @@
         </div>
     </section>
 
-    <!-- Modal -->
+    <!-- Modal Image-->
     <div wire:ignore.self class="modal fade align-items-center" id="editimageModal" tabindex="-1" aria-labelledby="editimageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
@@ -257,6 +273,7 @@
         </div>
     </div>
 
+    <!-- Modal Profile-->
     <div wire:ignore.self class="modal fade align-items-center" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
@@ -284,6 +301,7 @@
         </div>
     </div>
 
+    <!-- Modal Password-->
     <div wire:ignore.self class="modal fade align-items-center" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
@@ -295,14 +313,23 @@
                         <div class="mb-3">
                             <label for="password" class="form-label emas">Kata Sandi Lama</label>
                             <input type="password" class="form-control bg-modal" id="password" placeholder="Ketik di sini" wire:model.defer="password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('password', 'password-icon')" style="cursor: pointer; margin-top: 55px; margin-right:35px;">
+                                <i id="password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label emas">Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="new_password" placeholder="Ketik di sini" wire:model.defer="new_password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('new_password', 'new-password-icon')" style="cursor: pointer; margin-top: 140px; margin-right:35px;">
+                                <i id="new-password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label emas">Konfirmasi Kata Sandi Baru</label>
                             <input type="password" class="form-control bg-modal" id="confirm_password" placeholder="Ketik di sini" wire:model.defer="confirm_password">
+                            <span class="position-absolute end-0 top-0" onclick="togglePassword('confirm_password', 'confirm-password-icon')" style="cursor: pointer; margin-top: 225px; margin-right:35px;">
+                                <i id="confirm-password-icon" class="fa fa-eye text-warning"></i>
+                            </span>
                         </div>
                     </form>
                 </div>
@@ -313,6 +340,7 @@
         </div>
     </div>
 
+    <!-- Modal Logout-->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered px-5">
             <div class="modal-content bg-dark border-0">
@@ -334,3 +362,22 @@
     </div>
 
 </div>
+
+@push("scripts")
+    <script>
+        function togglePassword(inputId, iconId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+@endpush

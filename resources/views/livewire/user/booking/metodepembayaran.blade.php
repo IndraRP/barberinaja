@@ -264,7 +264,7 @@
                     <h1 class="fs-5 m-0 text-white"> Rp {{ number_format(session("total_pembayaran"), 0, ",", ".") }}
                     </h1>
                 </div>
-                <button type="button" class="btn kuning fs-6 fw-bold px-3 py-2 text-white" data-bs-toggle="modal" data-bs-target="#transactionModal" wire:click="bayar">
+                <button type="button" class="btn kuning fs-6 fw-bold px-3 py-2 text-white" data-bs-toggle="modal" data-bs-target="#transactionModal" wire:click="bayar({{ $selected_discount["id"] ?? "null" }})">
                     Lanjutkan
                 </button>
             </div>
@@ -326,7 +326,8 @@
 
                     <div class="row" onclick="copyToClipboard('{{ $nomer_rekening }}')" wire:click="showAlert">
                         <div class="col-5 fs-7 pt-1">No. Rekening</div>
-                        <div class="col-3 ms-2 p-0 text-end"><i class="bi bi-copy fs-10"></i></div>
+                        <div x-data="{ active: false }" @click="active = !active" class="col-3 ms-2 p-0 text-end"><i :class="active ? 'emas' : 'text-white'" class="bi bi-copy fs-10"></i></div>
+
                         <div class="col-3 fs-7 pt-1 text-end" id="accountNumber">123456789123</div>
                     </div>
                     <div class="row">
