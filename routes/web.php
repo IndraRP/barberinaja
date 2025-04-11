@@ -25,7 +25,7 @@ use App\Livewire\User\Profile\Profil;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/cek', function () {
-    dd(Hash::make('12345678'));
+    dd(Hash::make('indra123'));
     return view('welcome');
 });
 

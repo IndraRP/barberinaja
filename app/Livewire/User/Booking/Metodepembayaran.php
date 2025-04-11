@@ -155,7 +155,7 @@ class Metodepembayaran extends Component
         }
 
         $this->transactionId = $transaction->id;
-        $this->alert('success', 'Transaksi berhasil!');
+        // $this->alert('success', 'Transaksi berhasil!');
     }
 
 

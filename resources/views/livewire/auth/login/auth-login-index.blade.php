@@ -15,7 +15,6 @@
             background-color: #22232400;
             /* bg-dark */
         }
-        }
     </style>
 
 @endsection

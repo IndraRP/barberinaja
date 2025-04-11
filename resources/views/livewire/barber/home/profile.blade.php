@@ -164,7 +164,7 @@
             <div class="profile-card">
                 <div class="profile-header"></div>
 
-                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" alt="Profile Picture" class="profile-image" data-bs-toggle="modal" data-bs-target="#profileModal">
+                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" alt="Profile Picture" class="profile-image" id="openModal">
 
                 <div class="edit-icon" data-bs-toggle="modal" data-bs-target="#editimageModal">
                     <i class="bi bi-camera-fill emas fw-bold fs-6"></i>
@@ -206,11 +206,13 @@
 
 
     <!-- Modal untuk Foto Besar -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-body bg-dark rounded" style="width: 330px; height: 330px; object-fit: cover;">
-                <!-- Gambar Besar di dalam Modal -->
-                <img src="{{ asset("storage/" . ($image ?? "images/profiles/default.jpg")) }}" class="img-fluid d-block mx-auto rounded border-0" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
+    <div id="profilModal" class="modal fade" style="display: none;" tabindex="-1" aria-labelledby="profileModalLabel">
+        <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;">
+            <div class="modal-content bg-dark border border-white">
+                <div class="modal-body p-0" style="width: 330px; height: 330px; margin-top:10px">
+                    <!-- Gambar Besar di dalam Modal -->
+                    <img src="{{ asset("storage/" . ($image ?? "images/profiles/default1.jpg")) }}" class="img-fluid d-block mx-auto mt-2 rounded" alt="Profile" style="object-fit: cover; width: 90%; height: 92%; border-radius: 8px;">
+                </div>
             </div>
         </div>
     </div>
@@ -220,7 +222,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
-                    <h5 class="modal-title emas" id="editimageModalLabel">Edit Foto Profile Barbergfv</h5>
+                    <h5 class="modal-title emas" id="editimageModalLabel">Edit Foto Profile Barber</h5>
                 </div>
                 <div class="modal-body">
                     <form wire:submit.prevent="saveimage">
@@ -334,10 +336,13 @@
                 <div class="modal-body border-0 py-1">
                     <p class="fs-6 fw-bolder emas text-center">Apakah Anda Yakin ingin keluar dari Akun ini?</p>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger" onclick="Livewire.dispatch('logout')">Ya,
-                        Logout</button>
+                <div class="modal-footer d-flex justify-content-center border-0">
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger ms-2" onclick="Livewire.dispatch('logout')">Ya,
+                            Logout</button>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -362,5 +367,26 @@
                 icon.classList.add("fa-eye");
             }
         }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById("profilModal");
+            const openModalBtn = document.getElementById("openModal");
+
+            openModalBtn.addEventListener("click", function() {
+                modal.classList.add("show");
+                modal.style.display = "block";
+                document.body.classList.add("modal-open");
+            });
+
+            modal.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.classList.remove("show");
+                    modal.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                }
+            });
+        });
     </script>
 @endpush

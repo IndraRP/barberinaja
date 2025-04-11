@@ -152,8 +152,7 @@ class Homepage extends Component
 
     public function startLater()
     {
-        // Simpan waktu penundaan (misalnya, 10 menit ke depan)
-        $delayedUntil = \Carbon\Carbon::now()->addMinutes(1);
+        $delayedUntil = \Carbon\Carbon::now()->addMinutes(3);
 
         // Pastikan ada schedule yang dipilih
         if ($this->selectedSchedule) {
@@ -163,13 +162,13 @@ class Homepage extends Component
             // Pastikan perubahan masuk ke dalam database
             $this->selectedSchedule->refresh(); // Refresh untuk memastikan data terbaru
 
+            // Tutup modal setelah aksi
+            $this->dispatch('close-modal');
+
             // Tampilkan notifikasi sukses
             $this->alert('success', 'Berhasil!', [
                 'text' => 'Oke, kita akan tunggu hingga 10 menit.'
             ]);
-
-            // Tutup modal setelah aksi
-            $this->dispatch('close-modal');
             return redirect("/home_barber");
         }
     }

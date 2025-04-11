@@ -4,6 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource\RelationManagers\DetailTransactionsRelationManager;
+use App\Filament\Resources\TransactionsAllResource\Pages\CreateTransactionsAll;
+use App\Filament\Resources\TransactionsAllResource\Pages\EditTransactionsAll;
+use App\Filament\Resources\TransactionsAllResource\Pages\ListTransactionsAlls;
 use App\Models\Transaction;
 use App\Models\BarberSchedule;
 use Filament\Tables\Actions\Action;
@@ -20,13 +23,13 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 
-class TransactionResource extends Resource
+class TransactionsAllResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Transaksi';
-    protected static ?string $pluralLabel = 'Transaksi';
+    protected static ?string $navigationLabel = 'Transaksi All';
+    protected static ?string $pluralLabel = 'Transaksi All';
     protected static ?string $navigationGroup = 'Transaksi';
 
     public static function form(Form $form): Form
@@ -70,6 +73,7 @@ class TransactionResource extends Resource
 
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -138,25 +142,7 @@ class TransactionResource extends Resource
                         'arrived' => 'Arrived',
                         'canceled' => 'Canceled',
                     ])
-                    ->default('pending'), // Set default filter ke 'pending'
-
             ])
-            ->modifyQueryUsing(function ($query) {
-                $status = request()->input('filters.status');
-
-                if ($status === 'pending') {
-                    return $query->where('status', 'pending')
-                        ->whereNotNull('bukti_image');
-                }
-
-                // Jika status ada, tambahkan kondisi untuk status tersebut
-                if ($status) {
-                    return $query->where('status', $status);
-                }
-
-                return $query->where('status', 'pending')
-                    ->whereNotNull('bukti_image');
-            })
 
 
             // EditAction::make()
@@ -279,31 +265,21 @@ class TransactionResource extends Resource
                     })
                     ->icon('heroicon-o-trash'),
             ]);
-
-        // ->modifyQueryUsing(function ($query) {
-        //     if (request()->has('filters.status') && request()->input('filters.status') !== null) {
-        //         $query->where('status', request()->input('filters.status'));
-        //     } else {
-        //         $query->where('status', 'pending'); // Hanya jika filter status belum dipilih
-        //     }
-
-        //     return $query->whereNotNull('bukti_image')->latest();
-        // });
     }
 
     public static function getRelations(): array
     {
         return [
-            DetailTransactionsRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTransactions::route('/'),
-            // 'create' => Pages\CreateTransaction::route('/create'),
-            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            'index' => ListTransactionsAlls::route('/'),
+            'create' => CreateTransactionsAll::route('/create'),
+            'edit' => EditTransactionsAll::route('/{record}/edit'),
         ];
     }
 }

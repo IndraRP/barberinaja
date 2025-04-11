@@ -23,7 +23,6 @@ class ServiceResource extends Resource
     protected static ?string $navigationLabel = 'Layanan';
     protected static ?string $pluralLabel = 'Layanan';
     protected static ?string $navigationGroup = 'Isi Page';
-
     /**
      * Form untuk membuat dan mengedit service.
      */

@@ -16,15 +16,18 @@
             <h1 class="h6 fs-7 m-0 text-white">Barber {{ $name }}</h1>
         </div>
         <div class="d-flex align-items-center">
-            <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+            <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" id="openModal">
         </div>
     </div>
 
     <!-- Modal untuk Foto Besar -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-body bg-dark rounded" style="width: 330px; height: 330px; object-fit: cover;">
-                <img src="{{ asset("storage/" . ($image ?? "images/profiles/barber1.png")) }}" class="img-fluid d-block mx-auto rounded" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; margin-top:0px;">
+    <div id="profilModal" class="modal fade" style="display: none;" tabindex="-1" aria-labelledby="profileModalLabel">
+        <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;">
+            <div class="modal-content bg-dark border border-white">
+                <div class="modal-body p-0" style="width: 330px; height: 330px; margin-top:10px">
+                    <!-- Gambar Besar di dalam Modal -->
+                    <img src="{{ asset("storage/" . ($image ?? "images/profiles/default1.jpg")) }}" class="img-fluid d-block mx-auto mt-2 rounded" alt="Profile" style="object-fit: cover; width: 90%; height: 92%; border-radius: 8px;">
+                </div>
             </div>
         </div>
     </div>
@@ -54,7 +57,7 @@
             </div>
             <ul class="list-group fs-8 pt-1">
                 @foreach ($pendingSchedules as $schedule)
-                    <div wire:click="selectSchedule({{ $schedule->id }})" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                    <div wire:click="selectSchedule({{ $schedule->id }})" data-bs-toggle="modal" data-bs-target="#arrivalModal">
                         <li class="list-group-item abu border-warning my-1 rounded border px-2 text-white">
                             <div class="d-flex">
                                 <div class="d-block m-0 pt-1">
@@ -87,8 +90,8 @@
         @endif
     </div>
 
-    <!-- Modal -->
-    <div wire:ignore.self class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <!-- Modal Schedule Awal-->
+    {{-- <div wire:ignore.self class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background-color: #1e1e2d; color: #ffffff;">
                 @if ($selectedSchedule)
@@ -113,7 +116,7 @@
                 @endif
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- barber-arrival-modal -->
     <div>
@@ -143,7 +146,7 @@
                     </div>
                     <div class="modal-footer d-flex justify-content-center border-0">
                         <div>
-                            <button type="button" class="btn btn-secondary fs-7 fw-bolder px-3 py-2 text-white" wire:click="startLater">Kerjakan Nanti</button>
+                            <button type="button" class="btn btn-outline-secondary fs-7 fw-bolder px-3 py-2 text-white" wire:click="startLater">Kerjakan Nanti</button>
                             <button type="button" class="btn kuning fs-7 fw-bolder px-3 py-2 text-white" wire:click="startNow">Kerjakan Sekarang</button>
                         </div>
                     </div>
@@ -178,6 +181,27 @@
             loop: true,
             autoplay: true,
             path: '{{ asset("images/Animation1.json") }}'
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById("profilModal");
+            const openModalBtn = document.getElementById("openModal");
+
+            openModalBtn.addEventListener("click", function() {
+                modal.classList.add("show");
+                modal.style.display = "block";
+                document.body.classList.add("modal-open");
+            });
+
+            modal.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.classList.remove("show");
+                    modal.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                }
+            });
         });
     </script>
 @endpush

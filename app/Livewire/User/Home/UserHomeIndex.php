@@ -164,12 +164,12 @@ class UserHomeIndex extends Component
     public function checkApprovedTransaction()
     {
         $currentTime = Carbon::now();
-        $startTime = $currentTime->copy()->subMinutes(10);
-        $endTime = $currentTime->copy()->addMinutes(10);
+        $startTime = $currentTime->copy()->addMinutes(15);
+        $endTime = $currentTime->copy()->subMinutes(15);
 
         $this->transaction = Transaction::where('status', 'approved')
             ->whereDate('appointment_date', $currentTime->toDateString())
-            ->whereBetween('time', [$startTime->format('H:i'), $endTime->format('H:i')])
+            ->whereBetween('time', [$endTime->format('H:i'), $startTime->format('H:i')])
             ->first();
 
         // Jika transaksi ditemukan, buka modal
@@ -177,6 +177,8 @@ class UserHomeIndex extends Component
             $this->showModaltime = true;
             $this->dispatch('open-modal');
         }
+
+        //dd($endTime);
 
         $transaction = Transaction::where('status', 'approved')
             ->whereDate('appointment_date', '<', $currentTime->toDateString())
@@ -197,7 +199,7 @@ class UserHomeIndex extends Component
         if ($transaction) {
             // Gabungkan appointment_date dan time untuk mendapatkan waktu transaksi
             $transactionTime = Carbon::parse($transaction->appointment_date)->setTimeFromTimeString($transaction->time);
-            $transactionTimePlus10 = $transactionTime->addMinutes(10);
+            $transactionTimePlus10 = $transactionTime->addMinutes(15);
 
             if ($currentTime->greaterThanOrEqualTo($transactionTimePlus10)) {
                 $this->checkAndUpdateStatus($transaction);
@@ -255,6 +257,15 @@ class UserHomeIndex extends Component
                 'time' => $newTime,
                 'status' => 'approved',
             ]);
+
+        if ($updated) {
+            BarberSchedule::where('transaction_id', $transactionId)
+                ->update([
+                    'start_time' => $newTime,
+                    'end_time' => Carbon::parse($newTime)->addMinutes(30)->format('H:i'),
+                    'status' => 'pending',
+                ]);
+        }
 
         if ($updated) {
             $this->alert('success', 'Berhasil!', [

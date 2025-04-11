@@ -59,21 +59,24 @@ class Konfirmasi extends Component
     public function confirmPayment()
     {
         $this->validate();
+
         if (!$this->bukti_image) {
             logger()->error('File tidak ditemukan saat validasi.');
             $this->alert('error', 'Harap upload file sebelum mengonfirmasi pembayaran.');
             return;
         }
 
-
         $path = $this->bukti_image->store('images/bukti_transaksi', 'public');
 
-        $this->transaction->bukti_image = $path;
-        $this->transaction->save();
+        $this->transaction->update([
+            'bukti_image' => $path,
+            'status' => 'pending', // Set status menjadi pending
+        ]);
 
         $this->alert('success', 'Konfirmasi berhasil dilakukan.');
         return redirect()->route('history');
     }
+
 
     public function render()
     {

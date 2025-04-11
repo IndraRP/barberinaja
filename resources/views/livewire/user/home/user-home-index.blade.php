@@ -118,14 +118,14 @@
                 <div class="d-flex align-items-center">
                     <!-- Foto Profil -->
                     @if (!empty($image))
-                        <img src="{{ asset("storage/" . $image) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" @click="isVisible = true">
+                        <img src="{{ asset("storage/" . $image) }}" class="rounded-circle object-fit-cover ms-3 border border-white" style="height: 40px; width: 40px;" alt="Profile" id="openModal">
                     @endif
                 </div>
             </div>
 
             <!-- Modal untuk Foto Besar -->
-            <div x-show="isVisible" class="modal fade show" style="display: block;" tabindex="-1" id="profilModal" aria-labelledby="profileModalLabel" x-cloak @click.outside="isVisible = false" x-bind:inert="isVisible ? true : false">
-                <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;" @click.stop>
+            <div id="profilModal" class="modal fade" style="display: none;" tabindex="-1" aria-labelledby="profileModalLabel">
+                <div class="modal-dialog modal-dialog-centered ms-3" style="max-width: 330px; max-height: 330px;">
                     <div class="modal-content bg-dark border border-white">
                         <div class="modal-body p-0" style="width: 330px; height: 330px; margin-top:10px">
                             <!-- Gambar Besar di dalam Modal -->
@@ -136,7 +136,7 @@
             </div>
 
             <!-- Backdrop -->
-            <div x-show="isVisible" class="modal-backdrop fade show" x-cloak></div>
+            {{-- <div x-show="isVisible" class="modal-backdrop fade show" x-cloak></div> --}}
         </div>
 
         <!-- CSS Tambahan -->
@@ -376,9 +376,10 @@
                                 <p class="text-black-50 fs-8 fw-bolder mb-1">{{ $discount->description }}</p>
                                 <h1 class="fw-bold fs-7 mb-2 text-white">{{ $discount->name }}</h1>
                                 <!-- Tombol Pilih Diskon -->
-                                <button id="openModalButton{{ $discount->id }}" class="btn btn-dark btn-sm fs-9 rounded-pill">
+                                <button id="openModalButton{{ $discount->id }}" class="btn btn-dark btn-sm fs-9 rounded-pill" data-id="{{ $discount->id }}">
                                     <span class="p-2">Pakai Sekarang</span>
                                 </button>
+
                             </div>
                             <!-- Gambar diposisikan di kanan -->
                             <img src="{{ asset("storage/" . $discount->image) }}" alt="{{ $discount->name }}" class="img-fluid ms-auto rounded" style="height: 55px; width: 55px;">
@@ -555,9 +556,15 @@
 
                                 <div class="d-flex">
                                     <div class="ms-auto">
-                                        <!-- Tombol untuk update waktu -->
-                                        <button @click="showRecheduleModal = false" class="btn btn-outline-secondary mt-2">Tutup</button>
-                                        <button wire:click="notArrived('{{ $transaction ? $transaction->id : "" }}', '{{ $this->time }}')" class="btn btn-success mt-2">Atur Ulang Jadwal</button>
+                                        <!-- Tombol untuk update waktu dengan efek loading -->
+                                        <button @click="showRecheduleModal = false" class="btn btn-outline-secondary mt-2" wire:loading.attr="disabled">
+                                            <span wire:loading.remove> TUTUP </span>
+                                            <span wire:loading> Loading... </span>
+                                        </button>
+                                        <button wire:click="notArrived('{{ $transaction ? $transaction->id : "" }}', '{{ $this->time }}')" class="btn btn-success mt-2" wire:loading.attr="disabled">
+                                            <span wire:loading.remove> Atur Ulang Jadwal </span>
+                                            <span wire:loading> Loading... </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -620,22 +627,40 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            @foreach ($discounts as $discount)
-                const openModalButton{{ $discount->id }} = document.getElementById('openModalButton{{ $discount->id }}');
-                const modalElement{{ $discount->id }} = document.getElementById('myModal{{ $discount->id }}');
+            document.querySelectorAll('[id^="openModalButton"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    let discountId = this.getAttribute('data-id'); // Ambil ID diskon dari tombol
+                    let modalElement = document.getElementById('myModal' + discountId);
 
-                const modalInstance{{ $discount->id }} = new bootstrap.Modal(modalElement{{ $discount->id }});
-
-                openModalButton{{ $discount->id }}.addEventListener('click', function() {
-                    modalInstance{{ $discount->id }}.show();
+                    if (modalElement) {
+                        let modalInstance = new bootstrap.Modal(modalElement);
+                        modalInstance.show();
+                    } else {
+                        console.error('Modal dengan ID ' + discountId + ' tidak ditemukan.');
+                    }
                 });
-            @endforeach
+            });
         });
     </script>
 
     <script>
-        $("#profilModal").on('hide.bs.modal', function() {
-            return false;
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById("profilModal");
+            const openModalBtn = document.getElementById("openModal");
+
+            openModalBtn.addEventListener("click", function() {
+                modal.classList.add("show");
+                modal.style.display = "block";
+                document.body.classList.add("modal-open");
+            });
+
+            modal.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.classList.remove("show");
+                    modal.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                }
+            });
         });
     </script>
 @endpush
